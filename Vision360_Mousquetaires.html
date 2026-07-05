@@ -300,15 +300,13 @@
     <h1>⚔️ Vision 360° : Le Conseil des Mousquetaires ⚔️</h1>
 </header>
 
-<div class="config-bar" id="statusBar">
-    <div style="display: flex; align-items: center; gap: 15px; width: 100%;">
-        <button id="btnLaunch" onclick="startAllSystems()" style="background: var(--gold); color: black; padding: 10px 20px; font-weight: bold; border-radius: 5px;">🚀 ALLUMER L'ARSENAL</button>
-        <div id="statusOllama" style="font-size: 0.8em; color: #ff4444;">🧠 Ollama: Hors ligne</div>
-        <div id="statusBridge" style="font-size: 0.8em; color: #ff4444;">🔱 Pont Royal: Hors ligne</div>
-        <div style="flex: 1;"></div>
-        <div class="mousquetaires-list" id="modelList"></div>
+    <div class="config-bar" id="statusBar" style="flex-direction: column; align-items: center; padding: 20px; background: #111; border-bottom: 2px solid var(--gold);">
+        <button id="btnLaunch" onclick="startAllSystems()" style="background: var(--gold); color: black; padding: 15px 40px; font-weight: bold; border-radius: 5px; font-size: 1.2em; cursor: pointer; border: none; box-shadow: 0 0 15px rgba(255,215,0,0.3);">🚀 LANCER LE SYSTÈME</button>
+        <div id="systemTicker" style="margin-top: 15px; font-family: monospace; font-size: 0.9em; color: #888; text-align: center;">
+            En attente de l'ordre de mission...
+        </div>
+        <div id="modelList" class="mousquetaires-list" style="margin-top: 10px; display: none;"></div>
     </div>
-</div>
 
 <div class="main-container">
     <div class="input-area">
@@ -346,6 +344,15 @@
         <div id="archiveList" style="display: flex; flex-direction: column; gap: 5px;">
             Chargement...
         </div>
+
+        <hr style="border: 0; border-top: 1px solid #333; margin: 15px 0;">
+
+        <h3 style="color: #00ff00; font-size: 0.9em; margin: 0;">📟 CONSOLE SYSTÈME</h3>
+        <div style="background: #000; padding: 5px; border-radius: 4px; margin-top: 5px;">
+            <input type="text" id="shellInput" value="ollama serve" style="width: 100%; background: transparent; color: #00ff00; border: none; font-family: monospace; font-size: 0.8em;">
+            <div id="shellOutput" style="font-size: 0.7em; color: #888; margin-top: 5px; max-height: 100px; overflow-y: auto;">> Prêt pour vos ordres...</div>
+        </div>
+        <button onclick="executeShell()" style="width: 100%; margin-top: 5px; background: #222; color: #00ff00; font-size: 0.7em; border: 1px solid #00ff00;">EXÉCUTER</button>
 
         <hr style="border: 0; border-top: 1px solid #333; margin: 15px 0;">
 
@@ -462,33 +469,107 @@
         }
     }
 
+    async function executeShell(customCmd = null) {
+        const cmd = customCmd || document.getElementById('shellInput').value.trim();
+        const out = document.getElementById('shellOutput');
+
+        const log = (msg, color = "#888") => {
+            const line = document.createElement('div');
+            line.style.color = color;
+            line.innerText = `> ${msg}`;
+            out.prepend(line);
+        };
+
+        log(`Exécution : ${cmd}`, "#00ff00");
+
+        if (cmd.startsWith('pull ')) {
+            const model = cmd.replace('pull ', '');
+            log(`Téléchargement de ${model} lancé...`);
+            try {
+                fetch('http://localhost:11434/api/pull', {
+                    method: 'POST',
+                    body: JSON.stringify({ name: model })
+                });
+            } catch(e) { log("Erreur réseau.", "#ff4444"); }
+        } else if (cmd === 'list') {
+            fetchModels();
+            log("Actualisation de la liste des experts.");
+        } else {
+            try {
+                const response = await fetch('http://localhost:8081/forge', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `command=${encodeURIComponent(cmd)}`
+                });
+                const msg = await response.text();
+                log(msg, msg.includes("✅") ? "#00ff00" : "#ffaa00");
+            } catch (e) {
+                log("Le Pont Royal ne répond pas.", "#ff4444");
+            }
+        }
+    }
+
     async function startAllSystems() {
         const btn = document.getElementById('btnLaunch');
-        btn.innerText = "⏳ ANALYSE EN COURS...";
+        const ticker = document.getElementById('systemTicker');
 
-        // 1. Tester Ollama
-        try {
-            const r = await fetch('http://localhost:11434/api/tags');
-            if(r.ok) {
-                document.getElementById('statusOllama').innerText = "🧠 Ollama: Prêt";
-                document.getElementById('statusOllama').style.color = "#00ff00";
-            }
-        } catch(e) {
-            alert("ERREUR : Ollama n'est pas lancé.\n\nAction : Ouvrez un terminal et tapez :\n$env:OLLAMA_ORIGINS='*'; ollama serve");
-        }
+        const updateTicker = (cmd, status, color = "#888") => {
+            ticker.innerHTML = `<div><span style="color:var(--gold)">CMD:</span> ${cmd} | <span style="color:${color}">STATUT: ${status}</span></div>`;
+        };
 
-        // 2. Tester le Pont Royal
+        btn.innerText = "⏳ SÉQUENCE EN COURS...";
+        btn.disabled = true;
+
+        // ÉTAPE 1 : PONT ROYAL
+        updateTicker("./gradlew :app:runBridge", "Vérification...");
         try {
             const r = await fetch('http://localhost:8081/archives');
             if(r.ok) {
-                document.getElementById('statusBridge').innerText = "🔱 Pont Royal: Prêt";
-                document.getElementById('statusBridge').style.color = "#00ff00";
+                updateTicker("Pont Royal", "✅ ACTIF", "#00ff00");
             }
         } catch(e) {
-            alert("ERREUR : Le Pont Royal n'est pas lancé.\n\nAction : Dans Android Studio, faites un clic droit sur DartagnanBridge.kt et choisissez RUN.");
+            updateTicker("Pont Royal", "❌ ABSENT", "#ff4444");
+            alert("ERREUR CRITIQUE : Lancez le Pont Royal dans Android Studio !");
+            btn.innerText = "❌ ÉCHEC";
+            btn.disabled = false;
+            return;
         }
 
-        function openFullScreen(nickname, cardId) {
+        // ÉTAPE 2 : OLLAMA
+        updateTicker("ollama serve", "Vérification cerveau...");
+        try {
+            const r = await fetch('http://localhost:11434/api/tags');
+            if(r.ok) {
+                updateTicker("Ollama", "✅ PRÊT", "#00ff00");
+            }
+        } catch(e) {
+            updateTicker("ollama serve", "⚠️ SOMMEIL - Réveil en cours...", "#ffaa00");
+            await executeShell("ollama serve");
+            await new Promise(r => setTimeout(r, 5000));
+        }
+
+        // Vérification finale
+        try {
+            const r = await fetch('http://localhost:11434/api/tags');
+            if(r.ok) {
+                updateTicker("Ollama", "✅ PRÊT", "#00ff00");
+                fetchModels();
+                fetchArchives();
+                document.getElementById('modelList').style.display = 'flex';
+                ticker.innerHTML = "<div style='color:#00ff00; font-weight:bold;'>✨ SYSTÈME OPÉRATIONNEL - PRÊT AU COMBAT ✨</div>";
+                btn.innerText = "🔱 ARSENAL ACTIF";
+                btn.style.background = "#006400";
+                btn.style.color = "white";
+                btn.disabled = false;
+            }
+        } catch(e) {
+            updateTicker("Ollama", "❌ ÉCHEC RÉVEIL", "#ff4444");
+            btn.innerText = "❌ ÉCHEC";
+            btn.disabled = false;
+        }
+    }
+
+    function openFullScreen(nickname, cardId) {
         const content = document.getElementById(cardId).innerHTML;
         document.getElementById('modalTitle').innerText = "ÉTUDE DE " + nickname;
         document.getElementById('modalBody').innerHTML = content;
@@ -499,10 +580,26 @@
         document.getElementById('fullScreenModal').style.display = "none";
     }
 
-    fetchModels();
-        btn.innerText = "✅ ARSENAL OPÉRATIONNEL";
-        btn.style.background = "#006400";
-        btn.style.color = "white";
+    async function executeShell() {
+        const cmd = document.getElementById('shellInput').value.trim();
+        const out = document.getElementById('shellOutput');
+
+        if (cmd.startsWith('pull ')) {
+            const model = cmd.replace('pull ', '');
+            out.innerHTML = `> Téléchargement de ${model} lancé... (Vérifiez votre terminal Ollama)`;
+            try {
+                fetch('http://localhost:11434/api/pull', {
+                    method: 'POST',
+                    body: JSON.stringify({ name: model })
+                });
+            } catch(e) {}
+        } else if (cmd === 'list') {
+            fetchModels();
+            out.innerHTML = `> Liste des modèles actualisée.`;
+        } else {
+            out.innerHTML = `> Commande '${cmd}' envoyée au système.`;
+            forgeRequest(cmd);
+        }
     }
 
     async function fetchModels() {
@@ -578,6 +675,15 @@
         document.getElementById('btnSynthese').style.display = 'block';
     }
 
+    // Mapping des spécialités pour une Vision 360°
+    const roles = {
+        'llama3:latest': 'ARCHITECTE (Logique & Structure)',
+        'mistral:latest': 'ÉRUDIT (Clarté & Maintenance)',
+        'phi3:latest': 'OPTIMISATEUR (Performance & Ressources)',
+        'gemma2:latest': 'GARDE DU CORPS (Sécurité & Cas Limites)',
+        'codestral:latest': 'CHIRURGIEN (Code Pur & APIs)'
+    };
+
     async function askOneWithCritique(model, nickname, userPrompt, context) {
         const grid = document.getElementById('responsesGrid');
         const card = document.createElement('div');
@@ -591,7 +697,7 @@
                 <div class="sword-container" id="${swordId}">
                     <svg class="sword-svg" viewBox="0 0 20 100">
                         <defs>
-                            <linearGradient id="shineGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+                            <linearGradient id="buckinghamGradient" x1="0%" y1="100%" x2="0%" y2="0%">
                                 <stop offset="0%" stop-color="#777" />
                                 <stop offset="50%" stop-color="#FFF" />
                                 <stop offset="100%" stop-color="#777" />
@@ -619,10 +725,12 @@
         const sword = document.getElementById(swordId);
         sword.classList.add('state-received');
 
-        const systemMsg = "Tu es un mousquetaire du code, expert senior. Réponds UNIQUEMENT en français. Si tu vois une image, analyse-la avec précision. Si tu proposes du code, utilise // PATH: chemin/du/fichier.kt.";
+        const myRole = roles[model] || 'EXPERT SENIOR';
+        const systemMsg = `Tu es ${nickname}, membre du Conseil d'Élite Dartagnan. Ton angle d'analyse spécifique est : ${myRole}. RÉPONDS EXCLUSIVEMENT EN FRANÇAIS. Tu dois : 1. Apporter ton expertise unique sur ce point précis. 2. NE PAS te contenter de répéter tes collègues. 3. CHERCHER LA FAILLE ou l'oubli dans les réponses précédentes. 4. POSER une question critique si la demande est floue. Si tu proposes du code, utilise // PATH: chemin/du/fichier.kt.`;
+
         const instruction = context === ""
-            ? "Analyse ce problème (et l'image si présente) en tant qu'expert senior. RÉPONDS EXCLUSIVEMENT EN FRANÇAIS."
-            : `Voici le problème : "${userPrompt}". Tes collègues ont déjà proposé des solutions. Analyse-les et apporte ta propre expertise. RÉPONDS EXCLUSIVEMENT EN FRANÇAIS.\n\nCONTEXTE DES COLLÈGUES :\n${context}`;
+            ? `Analyse ce problème en tant que ${myRole}.`
+            : `Tes collègues ont déjà analysé le problème sous d'autres angles. EN TANT QUE ${myRole}, identifie ce qu'ils ont manqué et apporte ta propre lumière critique.\n\nCONTEXTE DU CONSEIL :\n${context}`;
 
         const payload = {
             model: model,

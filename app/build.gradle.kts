@@ -49,12 +49,13 @@ android {
     }
 }
 
-// AJOUT DE LA TÂCHE DE LANCEMENT DU PONT ROYAL
+// AJOUT DE LA TÂCHE DE LANCEMENT DU PONT ROYAL (V2.8)
 tasks.register<JavaExec>("runBridge") {
     group = "dartagnan"
     description = "Lance le Pont Royal pour la page Web"
     mainClass.set("com.vahan.dartagnan.DartagnanBridgeKt")
     
+    // On utilise la configuration d'exécution de l'application
     val runtimeConfig = configurations.getByName("debugRuntimeClasspath")
     val compileTask = tasks.getByName("compileDebugKotlin")
     

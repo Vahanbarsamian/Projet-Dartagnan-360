@@ -1,4 +1,4 @@
- package com.vahan.dartagnan
+package com.vahan.dartagnan
 
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -67,10 +67,21 @@ fun main() {
                 val params = call.receiveParameters()
                 val command = params["command"] ?: ""
                 try {
-                    val process = Runtime.getRuntime().exec(command)
-                    val result = process.waitFor()
-                    if (result == 0) call.respondText("✅ Forge réussie.")
-                    else call.respondText("❌ Erreur code $result", status = HttpStatusCode.InternalServerError)
+                    // On detecte si c'est un lancement de service (comme ollama) pour ne pas bloquer
+                    val isService = command.contains("serve") || command.contains("start")
+                    val process = if (isService) {
+                        Runtime.getRuntime().exec("cmd /c start /min $command")
+                    } else {
+                        Runtime.getRuntime().exec(command)
+                    }
+                    
+                    if (isService) {
+                        call.respondText("⚡ Service lancé en arrière-plan.")
+                    } else {
+                        val result = process.waitFor()
+                        if (result == 0) call.respondText("✅ Forge réussie.")
+                        else call.respondText("❌ Erreur code $result", status = HttpStatusCode.InternalServerError)
+                    }
                 } catch (e: Exception) {
                     call.respondText("❌ Erreur : ${e.message}", status = HttpStatusCode.InternalServerError)
                 }
