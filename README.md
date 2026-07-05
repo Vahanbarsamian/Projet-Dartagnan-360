@@ -25,7 +25,7 @@ Il est indispensable pour ceux qui :
 2.  **Clé API (Optionnelle)** : Renommez `.env.example` en `.env` et insérez votre clé Gemini pour le Duc de Buckingham.
 
 ### 🏁 LANCEMENT "UN CLIC"
-*   **Sur Windows** : Double-cliquez sur `Dartagnan360.bat`. Le script configure Java, réveille Ollama et lance l'interface automatiquement.
+*   **Sur Windows** : Copiez Dartagan360.bat et placesz le sur votre bureau.Double-cliquez sur `Dartagnan360.bat`. Le script configure Java, réveille Ollama et lance l'interface automatiquement.
 *   **Sur Apple (macOS)** : 
     1.  Ouvrez un terminal et tapez `chmod +x Dartagnan360.command`.
     2.  Double-cliquez sur `Dartagnan360.command`.
@@ -53,7 +53,7 @@ Perfect for those who:
 2.  **API Key**: Rename `.env.example` to `.env` and paste your Gemini key for the "Duke of Buckingham".
 
 ### 🏁 ONE-CLICK LAUNCH
-*   **Windows**: Double-click `Dartagnan360.bat`. The script auto-configs Java, wakes up Ollama, and opens the UI.
+*   **Windows**: Copy dartagnen360.bat and place it on your Desktop. Double-click `Dartagnan360.bat`. The script auto-configs Java, wakes up Ollama, and opens the UI.
 *   **Apple (macOS)**: 
     1.  Run `chmod +x Dartagnan360.command` in terminal.
     2.  Double-click `Dartagnan360.command`.
@@ -72,7 +72,7 @@ Dartagnan es una estación de combate de ingeniería diseñada para **desarrolla
 3.  **Hardware**: GPU NVIDIA (8GB VRAM+) y 16GB RAM recomendados.
 
 ### 🏁 LANZAMIENTO "UN CLIC"
-*   **Windows**: Doble clic en `Dartagnan360.bat`.
+*   **Windows**: Copia Dartagnan360.bat y colócalo en el escritorio. Doble clic en `Dartagnan360.bat`.
 *   **Apple (macOS)**: Ejecute `chmod +x Dartagnan360.command` y luego doble clic.
 
 ---
