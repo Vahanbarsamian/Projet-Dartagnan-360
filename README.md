@@ -1,4 +1,4 @@
-# ⚔️ The Musketeer Protocol : Dartagnan Vision 360° (V2.2) 🔱
+# ⚔️ The Musketeer Protocol : Dartagnan Vision 360° (V2.3) 🔱
 
 [Français](#français) | [English](#english) | [Español](#español)
 
@@ -18,10 +18,16 @@ Le **Musketeer Protocol** est un arsenal Multi-IA conçu pour répondre aux beso
     `ollama pull llama3 mistral codestral phi3 gemma2 llava`
 3.  **Hardware** : Carte graphique (NVIDIA) avec 8 Go VRAM recommandée.
 
+### 🔐 CONFIGURATION DE LA CLÉ API
+L'outil utilise un fichier `.env` pour stocker votre clé Gemini (Duc de Buckingham).
+1.  Renommez `.env.example` en `.env`.
+2.  Obtenez une clé gratuite sur [Google AI Studio](https://aistudio.google.com/app/apikey).
+3.  Collez-la dans le fichier `.env`.
+
 ### 📖 MODE D'EMPLOI RAPIDE
 1.  **Ollama** : Lancez avec `set OLLAMA_ORIGINS="*" && ollama serve`
 2.  **Lancement** : Utilisez `Dartagnan360.bat` (Windows) ou `Dartagnan360.command` (Mac).
-3.  **Interface** : Cliquez sur **🚀 ALLUMER L'ARSENAL** sur la page Web.
+3.  **Forge de l'EXE** : Pour créer votre propre exécutable Windows, utilisez "Bat To Exe Converter" sur le fichier `.bat`.
 
 ---
 
@@ -33,16 +39,14 @@ The **Musketeer Protocol** is a Multi-AI development arsenal originally forged f
 
 ### 🛠️ MANDATORY PREREQUISITES
 1.  **Android Studio**: [Download here](https://developer.android.com/studio).
-    *   *Setup*: Open the project and wait for Gradle to sync all dependencies.
 2.  **Ollama**: [Download here](https://ollama.com).
-    *   *Models*: Run these commands in your terminal:
-    `ollama pull llama3 mistral codestral phi3 gemma2 llava`
-3.  **Hardware**: NVIDIA GPU with at least 8GB VRAM recommended.
+    *   `ollama pull llama3 mistral codestral phi3 gemma2 llava`
+3.  **Hardware**: NVIDIA GPU (8GB VRAM recommended).
 
-### 📖 QUICK START GUIDE
-1.  **Ollama**: Start with `set OLLAMA_ORIGINS="*" && ollama serve`
-2.  **Launch**: Use `Dartagnan360.bat` (Windows) or `Dartagnan360.command` (Mac).
-3.  **Interface**: Click on **🚀 ACTIVATE ARSENAL** on the Web page.
+### 🔐 API KEY SETUP
+1.  Rename `.env.example` to `.env`.
+2.  Get a free key at [Google AI Studio](https://aistudio.google.com/app/apikey).
+3.  Paste it into the `.env` file.
 
 ---
 
@@ -50,20 +54,17 @@ The **Musketeer Protocol** is a Multi-AI development arsenal originally forged f
 ## 🇪🇸 VERSIÓN ESPAÑOLA
 
 ### 🌟 El Origen: El Desafío H2C
-El **Protocolo Mosquetero** es un arsenal de desarrollo Multi-IA diseñado para las necesidades críticas del **proyecto H2C**. Permite obtener una "Verdad Técnica" indiscutible al hacer que las mejores IA locales debatan entre sí.
+El **Protocolo Mosquetero** es un arsenal de desarrollo Multi-IA diseñado para las necesidades críticas del **proyecto H2C**.
 
 ### 🛠️ REQUISITOS PREVIOS OBLIGATORIOS
 1.  **Android Studio**: [Descargar aquí](https://developer.android.com/studio).
-    *   *Config*: Abra el proyecto y espere a que Gradle sincronice las dependencias.
 2.  **Ollama**: [Descargar aquí](https://ollama.com).
-    *   *Modelos*: Ejecute estos comandos en su terminal:
-    `ollama pull llama3 mistral codestral phi3 gemma2 llava`
-3.  **Hardware**: Tarjeta gráfica (NVIDIA) con 8 GB de VRAM recomendada.
+    *   `ollama pull llama3 mistral codestral phi3 gemma2 llava`
 
-### 📖 GUÍA DE INICIO RÁPIDO
-1.  **Ollama**: Inicie con `set OLLAMA_ORIGINS="*" && ollama serve`
-2.  **Lanzamiento**: Use `Dartagnan360.bat` (Windows) o `Dartagnan360.command` (Mac).
-3.  **Interfaz**: Haga clic en **🚀 ENCENDER EL ARSENAL** en la página Web.
+### 🔐 CONFIGURACIÓN DE LA CLAVE API
+1.  Renombre `.env.example` a `.env`.
+2.  Obtenga una clave gratuita en [Google AI Studio](https://aistudio.google.com/app/apikey).
+3.  Péguela en el archivo `.env`.
 
 ---
 
