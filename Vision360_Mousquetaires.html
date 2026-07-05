@@ -218,7 +218,7 @@
 
         /* ÉTAT 2 : RÉFLEXION (Lumière fluide le long de la lame) */
         .state-thinking .blade {
-            fill: url(#shineGradient);
+            fill: url(#buckinghamGradient);
             filter: drop-shadow(0 0 5px var(--gold));
             animation: lightFlow 1s linear infinite;
         }
@@ -308,6 +308,7 @@
         <div id="modelList" class="mousquetaires-list" style="margin-top: 10px; display: none;"></div>
     </div>
 
+    <svg style="width:0; height:0; position:absolute;"><defs><linearGradient id="buckinghamGradient" x1="0%" y1="100%" x2="0%" y2="0%"><stop offset="0%" stop-color="#333" /><stop offset="50%" stop-color="#FFF" /><stop offset="100%" stop-color="#333" /></linearGradient></defs></svg>
 <div class="main-container">
     <div class="input-area">
         <div style="display: flex; gap: 5px;">
@@ -696,13 +697,6 @@
             <h3>
                 <div class="sword-container" id="${swordId}">
                     <svg class="sword-svg" viewBox="0 0 20 100">
-                        <defs>
-                            <linearGradient id="buckinghamGradient" x1="0%" y1="100%" x2="0%" y2="0%">
-                                <stop offset="0%" stop-color="#777" />
-                                <stop offset="50%" stop-color="#FFF" />
-                                <stop offset="100%" stop-color="#777" />
-                            </linearGradient>
-                        </defs>
                         <path class="blade" d="M10 5 L13 85 L7 85 Z" />
                         <rect class="guard" x="3" y="85" width="14" height="4" rx="2" />
                         <rect class="hilt" x="8" y="89" width="4" height="8" fill="#5D2906" />
@@ -726,11 +720,18 @@
         sword.classList.add('state-received');
 
         const myRole = roles[model] || 'EXPERT SENIOR';
-        const systemMsg = `Tu es ${nickname}, membre du Conseil d'Élite Dartagnan. Ton angle d'analyse spécifique est : ${myRole}. RÉPONDS EXCLUSIVEMENT EN FRANÇAIS. Tu dois : 1. Apporter ton expertise unique sur ce point précis. 2. NE PAS te contenter de répéter tes collègues. 3. CHERCHER LA FAILLE ou l'oubli dans les réponses précédentes. 4. POSER une question critique si la demande est floue. Si tu proposes du code, utilise // PATH: chemin/du/fichier.kt.`;
+        const systemMsg = `Tu es ${nickname}, expert de haut vol.
+        IMPORTANT : Tu analyses le projet H2C. C'est une technologie de RUPTURE.
+        DIRECTIVES STRICTES :
+        1. RESTE fidèle à la physique décrite (Triboélectricité, Contra-rotation, Électrons chauds).
+        2. INTERDICTION de suggérer des méthodes classiques (ex: électrolyse standard) si elles contredisent le manifeste.
+        3. IDENTIFIE les points forts déjà présents (Zéro terres rares, Zéro pollution) comme des acquis, pas comme des points à chercher.
+        4. SOIS CHIRURGICAL : Si tu ne comprends pas une interaction particule/or, pose une question au lieu d'inventer.
+        5. RÉPONDS EXCLUSIVEMENT EN FRANÇAIS.`;
 
         const instruction = context === ""
-            ? `Analyse ce problème en tant que ${myRole}.`
-            : `Tes collègues ont déjà analysé le problème sous d'autres angles. EN TANT QUE ${myRole}, identifie ce qu'ils ont manqué et apporte ta propre lumière critique.\n\nCONTEXTE DU CONSEIL :\n${context}`;
+            ? `Analyse cette section du manifeste H2C avec l'angle ${myRole}. Ne sois pas générique, sois disruptif.`
+            : `Voici le contexte des collègues. EN TANT QUE ${myRole}, critique radicalement toute suggestion "standard" qui affaiblirait l'innovation H2C.\n\nCONTEXTE :\n${context}`;
 
         const payload = {
             model: model,
@@ -780,6 +781,9 @@
     }
 
     async function generateSynthese() {
+        // Remonter en haut de page en douceur
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
         const grid = document.getElementById('responsesGrid');
         const cards = grid.querySelectorAll('.response-card');
         let allResponses = "";
@@ -805,10 +809,17 @@
         grid.prepend(syntheseCard);
 
         try {
-            const promptSynthese = `Tu es le Cardinal de Richelieu, stratège suprême. Voici les rapports de tes mousquetaires sur une question technique.
-            1. Fais-en une synthèse critique EN FRANÇAIS.
-            2. ÉTABLIS UN PLAN D'ACTION CLAIR : liste chaque fichier à modifier avec son chemin (PATH).
-            3. DONNE LE CODE FINAL COMPLET pour chaque fichier concerné, en commençant chaque bloc par // PATH: chemin/du/fichier.kt.
+            const promptSynthese = `Tu es le Cardinal de Richelieu, Grand Arbitre de la Science H2C.
+            TA MISSION : Faire une synthèse TECHNIQUE et CRITIQUE des rapports des mousquetaires.
+
+            RÈGLES D'OR DE COHÉRENCE PHYSIQUE :
+            1. REJETTE toute proposition "classique" (électrolyse, liquide) qui contredit le système H2C de triboélectricité contra-rotative sèche.
+            2. SANCTIONNE l'incompétence : si une IA a zappé les acquis du manifeste (zéro terre rare, décarbonation), ignore son avis.
+            3. SYNTHÉTISE uniquement ce qui renforce la technologie de rupture H2C (Electrons chauds, inclusions d'or, rendement nano-particules).
+            4. RÉDIGE un plan d'action qui respecte à 100% la vision du Général (Vahan).
+            5. DONNE LE CODE FINAL COMPLET pour chaque fichier concerné, en commençant chaque bloc par // PATH: chemin/du/fichier.kt.
+
+            RÉPONDS EXCLUSIVEMENT EN FRANÇAIS.
 
             CONSEILS DES MOUSQUETAIRES :\n${allResponses}`;
 
