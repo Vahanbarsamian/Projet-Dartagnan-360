@@ -1,68 +1,81 @@
-# ⚔️ The Musketeer Protocol : Dartagnan Vision 360° (V2.4) 🔱
+# ⚔️ The Musketeer Protocol : Dartagnan Vision 360° (V3.0) 🔱
 
 [Français](#français) | [English](#english) | [Español](#español)
 
 ---
 
 <a name="français"></a>
-## 🇫🇷 VERSION FRANÇAISE : L'Ingénierie Augmentée
+## 🇫🇷 VERSION FRANÇAISE
 
-### 🌟 Pourquoi cet outil ? (Le Défi H2C)
-Le **Musketeer Protocol** est né d'une nécessité vitale lors du développement du projet **H2C**. Face à des calculs complexes et des exigences de sécurité extrêmes, une IA classique ne suffit pas. Nous avons créé ce système pour multiplier par 5 la force de travail d'un ingénieur tout en garantissant une précision chirurgicale.
+### 🎯 POUR QUI EST CONÇU CET OUTIL ?
+Dartagnan est une station de combat d'ingénierie conçue pour les **développeurs seniors, les architectes logiciels et les chercheurs** travaillant sur des projets complexes et sensibles (comme le projet **H2C**). 
+Il est indispensable pour ceux qui :
+*   Exigent une **confidentialité totale** (Zéro Cloud, Zéro fuite).
+*   Ont besoin d'une **analyse multi-angle** (Vision 360°) pour éliminer les erreurs de logique.
+*   Souhaitent automatiser la modification de leur code et la génération de livrables.
 
-### 🔥 La Force de Frappe
-*   **Intelligence Collective** : Ne demandez pas un avis, lancez un débat entre Llama3, Mistral, Codestral et Gemma2.
-*   **Sécurité Totale** : 100% local. Vos secrets industriels ne quittent jamais votre machine.
-*   **Action Directe** : L'IA ne parle pas seulement, elle modifie votre code Android et forge vos documents.
+### 🛠️ PRÉ-REQUIS
+1.  **Ollama** : [Télécharger ici](https://ollama.com).
+2.  **Android Studio** : [Télécharger ici](https://developer.android.com/studio). (Nécessaire pour le moteur Java et Ktor).
+3.  **Matériel** : GPU NVIDIA (8 Go VRAM+) et 16 Go RAM recommandés pour faire débattre les IA fluidement.
 
-### 🛠️ CONFIGURATION & INSTALLATION
-1.  **Android Studio** : Indispensable pour le moteur de compilation.
-2.  **Ollama** : Installez-le et téléchargez les modèles : `ollama pull llama3 mistral codestral phi3 gemma2 llava`.
-3.  **Clé Cloud** : Renommez `.env.example` en `.env` et collez votre clé Gemini (IA Studio).
+### 🚀 INSTALLATION & CONFIGURATION
+1.  **Téléchargement des experts** : Dans un terminal, lancez :
+    `ollama pull llama3 mistral codestral phi3 gemma2 llava`
+2.  **Clé API (Optionnelle)** : Renommez `.env.example` en `.env` et insérez votre clé Gemini pour le Duc de Buckingham.
+
+### 🏁 LANCEMENT "UN CLIC"
+*   **Sur Windows** : Double-cliquez sur `Dartagnan360.bat`. Le script configure Java, réveille Ollama et lance l'interface automatiquement.
+*   **Sur Apple (macOS)** : 
+    1.  Ouvrez un terminal et tapez `chmod +x Dartagnan360.command`.
+    2.  Double-cliquez sur `Dartagnan360.command`.
 
 ---
 
 <a name="english"></a>
-## 🇺🇸 ENGLISH VERSION: Augmented Engineering
+## 🇺🇸 ENGLISH VERSION
 
-### 🌟 Why this tool? (The H2C Challenge)
-The **Musketeer Protocol** was born from a vital necessity during the **H2C project** development. Facing complex calculations and extreme security requirements, a standard AI wasn't enough. We built this to 5x an engineer's workforce while ensuring surgical precision.
+### 🎯 TARGET AUDIENCE
+Dartagnan is an engineering war station built for **senior developers, software architects, and researchers** handling complex and sensitive projects (such as the **H2C project**).
+Perfect for those who:
+*   Require **absolute privacy** (Local-first, no data leaks).
+*   Need **360° multi-angle analysis** to eliminate logic flaws.
+*   Want to automate code modification and document generation.
 
-### 🔥 Unstoppable Strengths
-*   **Collective Intelligence**: Don't just ask an AI, start a debate between Llama3, Mistral, Codestral, and Gemma2.
-*   **Absolute Privacy**: 100% local. Your industrial secrets never leave your machine.
-*   **Executive Action**: The system doesn't just talk; it modifies your Android code and forges your files.
+### 🛠️ PREREQUISITES
+1.  **Ollama**: [Download here](https://ollama.com).
+2.  **Android Studio**: [Download here](https://developer.android.com/studio). (Used as the core runtime engine).
+3.  **Hardware**: NVIDIA GPU (8GB VRAM+) and 16GB RAM recommended.
 
-### 🛠️ SETUP & INSTALLATION
-1.  **Android Studio**: Mandatory for the build engine.
-2.  **Ollama**: Install it and pull the models: `ollama pull llama3 mistral codestral phi3 gemma2 llava`.
-3.  **API Key**: Rename `.env.example` to `.env` and paste your Gemini key (AI Studio).
+### 🚀 SETUP
+1.  **Pull the models**: Run in your terminal:
+    `ollama pull llama3 mistral codestral phi3 gemma2 llava`
+2.  **API Key**: Rename `.env.example` to `.env` and paste your Gemini key for the "Duke of Buckingham".
+
+### 🏁 ONE-CLICK LAUNCH
+*   **Windows**: Double-click `Dartagnan360.bat`. The script auto-configs Java, wakes up Ollama, and opens the UI.
+*   **Apple (macOS)**: 
+    1.  Run `chmod +x Dartagnan360.command` in terminal.
+    2.  Double-click `Dartagnan360.command`.
 
 ---
 
 <a name="español"></a>
-## 🇪🇸 VERSIÓN ESPAÑOLA: Ingeniería Aumentada
+## 🇪🇸 VERSIÓN ESPAÑOLA
 
-### 🌟 ¿Por qué esta herramienta? (El Desafío H2C)
-El **Protocolo Mosquetero** nació de una necesidad vital durante el desarrollo del proyecto **H2C**. Para cálculos complejos y requisitos de seguridad extremos, una IA estándar no era suficiente. Creamos este sistema para multiplicar por 5 la capacidad de trabajo de un ingeniero garantizando una precisión quirúrgica.
+### 🎯 ¿PARA QUIÉN ES ESTA HERRAMIENTA?
+Dartagnan es una estación de combate de ingeniería diseñada para **desarrolladores senior, arquitectos de software e investigadores** que trabajan en proyectos complejos (como el proyecto **H2C**).
 
-### 🔥 La Fuerza del Consejo
-*   **Inteligencia Colectiva**: No solo pregunte, inicie un debate entre Llama3, Mistral, Codestral y Gemma2.
-*   **Privacidad Absoluta**: 100% local. Sus secretos industriales nunca salen de su máquina.
-*   **Acción Ejecutiva**: El sistema no solo habla; modifica su código Android y forja sus documentos.
+### 🛠️ REQUISITOS PREVIOS
+1.  **Ollama**: [Descargar aquí](https://ollama.com).
+2.  **Android Studio**: [Descargar aquí](https://developer.android.com/studio).
+3.  **Hardware**: GPU NVIDIA (8GB VRAM+) y 16GB RAM recomendados.
 
-### 🛠️ CONFIGURACIÓN E INSTALACIÓN
-1.  **Android Studio**: Obligatorio para el motor de compilación.
-2.  **Ollama**: Instálelo y descargue los modelos: `ollama pull llama3 mistral codestral phi3 gemma2 llava`.
-3.  **Clave API**: Cambie el nombre de `.env.example` a `.env` y pegue su clave Gemini (AI Studio).
+### 🏁 LANZAMIENTO "UN CLIC"
+*   **Windows**: Doble clic en `Dartagnan360.bat`.
+*   **Apple (macOS)**: Ejecute `chmod +x Dartagnan360.command` y luego doble clic.
 
 ---
 
-## 📖 GUIDE D'UTILISATION / USAGE GUIDE / GUÍA DE USO
-1.  **Launch**: Windows (`.bat`) or Mac (`.command`).
-2.  **Activate**: Click on **🚀 ALLUMER L'ARSENAL** (FR) / **ACTIVATE ARSENAL** (EN).
-3.  **Command**: Submit your code or images.
-4.  **Synthesize**: Click **🔱 SYNTHÈSE SUPRÊME** to get the final battle plan.
-5.  **Apply**: Click **🔱 AUTORISER LE SIÈGE** to update your project instantly.
-
-**"Un pour tous, et tous pour le Code !"** ⚔️🔱
+**"Un pour tous, et tous pour H2C !"** ⚔️🔱
+*MIT License - 100% Private - 100% Free*
