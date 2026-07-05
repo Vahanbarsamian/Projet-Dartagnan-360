@@ -243,7 +243,38 @@
             50% { opacity: 0.8; filter: brightness(1.5); }
         }
 
-        .status-icon { float: right; font-size: 1.2em; transition: 0.5s; }
+        /* Fenetre Plein Ecran (Modal) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            overflow-y: auto;
+            padding: 40px;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            margin: auto;
+            padding: 30px;
+            border: 2px solid var(--gold);
+            width: 80%;
+            max-width: 1000px;
+            border-radius: 10px;
+            line-height: 1.6;
+            color: white;
+            font-size: 1.1em;
+        }
+
+        .close-modal {
+            position: fixed;
+            right: 30px; top: 20px;
+            color: var(--gold);
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
         .status-pending { color: #555; }
         .status-done { color: #00ff00; }
 
@@ -253,7 +284,13 @@
     <!-- Moteurs de Rendu : Texte (Marked) et Images (Mermaid) -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-    <script>
+    <div id="fullScreenModal" class="modal">
+    <span class="close-modal" onclick="closeFullScreen()">&times;</span>
+    <div id="modalTitle" style="color: var(--gold); font-size: 1.5em; margin-bottom: 20px; text-align: center; font-variant: small-caps;"></div>
+    <div id="modalBody" class="modal-content"></div>
+</div>
+
+<script>
         mermaid.initialize({ startOnLoad: false, theme: 'dark' });
     </script>
 </head>
@@ -327,6 +364,12 @@
     <div id="shellOutput" style="font-family: monospace; font-size: 0.85em; color: #888; background: #050505; padding: 10px; border-radius: 4px; max-height: 100px; overflow-y: auto;">
         Système prêt. En attente d'ordres...
     </div>
+</div>
+
+<div id="fullScreenModal" class="modal">
+    <span class="close-modal" onclick="closeFullScreen()">&times;</span>
+    <div id="modalTitle" style="color: var(--gold); font-size: 1.5em; margin-bottom: 20px; text-align: center; font-variant: small-caps;"></div>
+    <div id="modalBody" class="modal-content"></div>
 </div>
 
 <script>
@@ -445,7 +488,18 @@
             alert("ERREUR : Le Pont Royal n'est pas lancé.\n\nAction : Dans Android Studio, faites un clic droit sur DartagnanBridge.kt et choisissez RUN.");
         }
 
-        fetchModels();
+        function openFullScreen(nickname, cardId) {
+        const content = document.getElementById(cardId).innerHTML;
+        document.getElementById('modalTitle').innerText = "ÉTUDE DE " + nickname;
+        document.getElementById('modalBody').innerHTML = content;
+        document.getElementById('fullScreenModal').style.display = "block";
+    }
+
+    function closeFullScreen() {
+        document.getElementById('fullScreenModal').style.display = "none";
+    }
+
+    fetchModels();
         btn.innerText = "✅ ARSENAL OPÉRATIONNEL";
         btn.style.background = "#006400";
         btn.style.color = "white";
@@ -551,10 +605,11 @@
                 </div>
                 ${nickname}
                 <div style="margin-left: auto; display: flex; gap: 5px;">
-                    <button class="copy-btn" onclick="copyToClipboard('${cardId}')">COPIER</button>
-                    <button class="copy-btn" onclick="saveToDesktop('${nickname}', '${cardId}')">🔱 DÉPOSER</button>
-                    <button class="copy-btn" style="border-color: #00ff00; color: #00ff00;" onclick="applyToProject('${cardId}')">🔱 APPLIQUER</button>
-                    <button class="copy-btn" style="border-color: #ff00ff; color: #ff00ff;" onclick="openForge('${cardId}')">🔨 FORGER</button>
+                    <button class="copy-btn" title="Voir l'étude en plein écran" onclick="openFullScreen('${nickname}', '${cardId}')">⛶</button>
+                    <button class="copy-btn" title="Copier dans le presse-papier" onclick="copyToClipboard('${cardId}')">📋</button>
+                    <button class="copy-btn" title="Déposer le rapport sur le bureau" onclick="saveToDesktop('${nickname}', '${cardId}')">📥</button>
+                    <button class="copy-btn" style="border-color: #00ff00; color: #00ff00;" title="Appliquer les modifications au projet Android" onclick="applyToProject('${cardId}')">🚀</button>
+                    <button class="copy-btn" style="border-color: #ff00ff; color: #ff00ff;" title="Lancer une commande système (Forge)" onclick="openForge('${cardId}')">⚒️</button>
                 </div>
             </h3>
             <div class="response-content" id="${cardId}">Analyse en cours...</div>
@@ -701,7 +756,18 @@
                 });
             } catch(e) {}
         } else if (cmd === 'list') {
-            fetchModels();
+            function openFullScreen(nickname, cardId) {
+        const content = document.getElementById(cardId).innerHTML;
+        document.getElementById('modalTitle').innerText = "ÉTUDE DE " + nickname;
+        document.getElementById('modalBody').innerHTML = content;
+        document.getElementById('fullScreenModal').style.display = "block";
+    }
+
+    function closeFullScreen() {
+        document.getElementById('fullScreenModal').style.display = "none";
+    }
+
+    fetchModels();
             out.innerHTML = `> Liste des modèles actualisée.`;
         } else {
             out.innerHTML = `> Commande '${cmd}' envoyée au système.`;
@@ -823,6 +889,17 @@
         } catch (e) {
             alert("Erreur de Forge.");
         }
+    }
+
+    function openFullScreen(nickname, cardId) {
+        const content = document.getElementById(cardId).innerHTML;
+        document.getElementById('modalTitle').innerText = "ÉTUDE DE " + nickname;
+        document.getElementById('modalBody').innerHTML = content;
+        document.getElementById('fullScreenModal').style.display = "block";
+    }
+
+    function closeFullScreen() {
+        document.getElementById('fullScreenModal').style.display = "none";
     }
 
     fetchModels();

@@ -1,72 +1,68 @@
-# ⚔️ The Musketeer Protocol : Dartagnan Vision 360° (V2.3) 🔱
+# ⚔️ The Musketeer Protocol : Dartagnan Vision 360° (V2.4) 🔱
 
 [Français](#français) | [English](#english) | [Español](#español)
 
 ---
 
 <a name="français"></a>
-## 🇫🇷 VERSION FRANÇAISE
+## 🇫🇷 VERSION FRANÇAISE : L'Ingénierie Augmentée
 
-### 🌟 L'Origine : Le Défi H2C
-Le **Musketeer Protocol** est un arsenal Multi-IA conçu pour répondre aux besoins critiques du **projet H2C**. Il permet d'obtenir une "Vérité Technique" indiscutable en faisant débattre les meilleures IA du marché en local.
+### 🌟 Pourquoi cet outil ? (Le Défi H2C)
+Le **Musketeer Protocol** est né d'une nécessité vitale lors du développement du projet **H2C**. Face à des calculs complexes et des exigences de sécurité extrêmes, une IA classique ne suffit pas. Nous avons créé ce système pour multiplier par 5 la force de travail d'un ingénieur tout en garantissant une précision chirurgicale.
 
-### 🛠️ PRÉ-REQUIS INDISPENSABLES
-1.  **Android Studio** : [Télécharger ici](https://developer.android.com/studio). 
-    *   *Config* : Ouvrez le projet et laissez Gradle synchroniser les dépendances.
-2.  **Ollama** : [Télécharger ici](https://ollama.com).
-    *   *Modèles* : Tapez ces commandes dans un terminal :
-    `ollama pull llama3 mistral codestral phi3 gemma2 llava`
-3.  **Hardware** : Carte graphique (NVIDIA) avec 8 Go VRAM recommandée.
+### 🔥 La Force de Frappe
+*   **Intelligence Collective** : Ne demandez pas un avis, lancez un débat entre Llama3, Mistral, Codestral et Gemma2.
+*   **Sécurité Totale** : 100% local. Vos secrets industriels ne quittent jamais votre machine.
+*   **Action Directe** : L'IA ne parle pas seulement, elle modifie votre code Android et forge vos documents.
 
-### 🔐 CONFIGURATION DE LA CLÉ API
-L'outil utilise un fichier `.env` pour stocker votre clé Gemini (Duc de Buckingham).
-1.  Renommez `.env.example` en `.env`.
-2.  Obtenez une clé gratuite sur [Google AI Studio](https://aistudio.google.com/app/apikey).
-3.  Collez-la dans le fichier `.env`.
-
-### 📖 MODE D'EMPLOI RAPIDE
-1.  **Ollama** : Lancez avec `set OLLAMA_ORIGINS="*" && ollama serve`
-2.  **Lancement** : Utilisez `Dartagnan360.bat` (Windows) ou `Dartagnan360.command` (Mac).
-3.  **Forge de l'EXE** : Pour créer votre propre exécutable Windows, utilisez "Bat To Exe Converter" sur le fichier `.bat`.
+### 🛠️ CONFIGURATION & INSTALLATION
+1.  **Android Studio** : Indispensable pour le moteur de compilation.
+2.  **Ollama** : Installez-le et téléchargez les modèles : `ollama pull llama3 mistral codestral phi3 gemma2 llava`.
+3.  **Clé Cloud** : Renommez `.env.example` en `.env` et collez votre clé Gemini (IA Studio).
 
 ---
 
 <a name="english"></a>
-## 🇺🇸 ENGLISH VERSION
+## 🇺🇸 ENGLISH VERSION: Augmented Engineering
 
-### 🌟 The Origin: The H2C Challenge
-The **Musketeer Protocol** is a Multi-AI development arsenal originally forged for the **H2C project**. It provides an indisputable "Technical Truth" by making the world's best local AI models debate and collaborate.
+### 🌟 Why this tool? (The H2C Challenge)
+The **Musketeer Protocol** was born from a vital necessity during the **H2C project** development. Facing complex calculations and extreme security requirements, a standard AI wasn't enough. We built this to 5x an engineer's workforce while ensuring surgical precision.
 
-### 🛠️ MANDATORY PREREQUISITES
-1.  **Android Studio**: [Download here](https://developer.android.com/studio).
-2.  **Ollama**: [Download here](https://ollama.com).
-    *   `ollama pull llama3 mistral codestral phi3 gemma2 llava`
-3.  **Hardware**: NVIDIA GPU (8GB VRAM recommended).
+### 🔥 Unstoppable Strengths
+*   **Collective Intelligence**: Don't just ask an AI, start a debate between Llama3, Mistral, Codestral, and Gemma2.
+*   **Absolute Privacy**: 100% local. Your industrial secrets never leave your machine.
+*   **Executive Action**: The system doesn't just talk; it modifies your Android code and forges your files.
 
-### 🔐 API KEY SETUP
-1.  Rename `.env.example` to `.env`.
-2.  Get a free key at [Google AI Studio](https://aistudio.google.com/app/apikey).
-3.  Paste it into the `.env` file.
+### 🛠️ SETUP & INSTALLATION
+1.  **Android Studio**: Mandatory for the build engine.
+2.  **Ollama**: Install it and pull the models: `ollama pull llama3 mistral codestral phi3 gemma2 llava`.
+3.  **API Key**: Rename `.env.example` to `.env` and paste your Gemini key (AI Studio).
 
 ---
 
 <a name="español"></a>
-## 🇪🇸 VERSIÓN ESPAÑOLA
+## 🇪🇸 VERSIÓN ESPAÑOLA: Ingeniería Aumentada
 
-### 🌟 El Origen: El Desafío H2C
-El **Protocolo Mosquetero** es un arsenal de desarrollo Multi-IA diseñado para las necesidades críticas del **proyecto H2C**.
+### 🌟 ¿Por qué esta herramienta? (El Desafío H2C)
+El **Protocolo Mosquetero** nació de una necesidad vital durante el desarrollo del proyecto **H2C**. Para cálculos complejos y requisitos de seguridad extremos, una IA estándar no era suficiente. Creamos este sistema para multiplicar por 5 la capacidad de trabajo de un ingeniero garantizando una precisión quirúrgica.
 
-### 🛠️ REQUISITOS PREVIOS OBLIGATORIOS
-1.  **Android Studio**: [Descargar aquí](https://developer.android.com/studio).
-2.  **Ollama**: [Descargar aquí](https://ollama.com).
-    *   `ollama pull llama3 mistral codestral phi3 gemma2 llava`
+### 🔥 La Fuerza del Consejo
+*   **Inteligencia Colectiva**: No solo pregunte, inicie un debate entre Llama3, Mistral, Codestral y Gemma2.
+*   **Privacidad Absoluta**: 100% local. Sus secretos industriales nunca salen de su máquina.
+*   **Acción Ejecutiva**: El sistema no solo habla; modifica su código Android y forja sus documentos.
 
-### 🔐 CONFIGURACIÓN DE LA CLAVE API
-1.  Renombre `.env.example` a `.env`.
-2.  Obtenga una clave gratuita en [Google AI Studio](https://aistudio.google.com/app/apikey).
-3.  Péguela en el archivo `.env`.
+### 🛠️ CONFIGURACIÓN E INSTALACIÓN
+1.  **Android Studio**: Obligatorio para el motor de compilación.
+2.  **Ollama**: Instálelo y descargue los modelos: `ollama pull llama3 mistral codestral phi3 gemma2 llava`.
+3.  **Clave API**: Cambie el nombre de `.env.example` a `.env` y pegue su clave Gemini (AI Studio).
 
 ---
 
+## 📖 GUIDE D'UTILISATION / USAGE GUIDE / GUÍA DE USO
+1.  **Launch**: Windows (`.bat`) or Mac (`.command`).
+2.  **Activate**: Click on **🚀 ALLUMER L'ARSENAL** (FR) / **ACTIVATE ARSENAL** (EN).
+3.  **Command**: Submit your code or images.
+4.  **Synthesize**: Click **🔱 SYNTHÈSE SUPRÊME** to get the final battle plan.
+5.  **Apply**: Click **🔱 AUTORISER LE SIÈGE** to update your project instantly.
+
 **"Un pour tous, et tous pour le Code !"** ⚔️🔱
-*Distributed under MIT License. 100% Private, 100% Local, 100% Free.*
