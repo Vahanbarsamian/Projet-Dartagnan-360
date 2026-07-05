@@ -1,0 +1,26 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Stylized D for Dartagnan -->
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M30,30 L50,30 C65,30 75,40 75,54 C75,68 65,78 50,78 L30,78 Z M40,40 L40,68 L50,68 C60,68 65,62 65,54 C65,46 60,40 50,40 Z" />
+
+    <!-- The Sword -->
+    <path
+        android:fillColor="#E0E0E0"
+        android:pathData="M52,20 L56,20 L56,75 L52,75 Z" /> <!-- Blade -->
+    <path
+        android:fillColor="#C0C0C0"
+        android:pathData="M45,75 L63,75 L63,78 L45,78 Z" /> <!-- Cross-guard -->
+    <path
+        android:fillColor="#8B4513"
+        android:pathData="M51,78 L57,78 L57,88 L51,88 Z" /> <!-- Hilt -->
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M50,88 A4,4 0 1 1 58,88 A4,4 0 1 1 50,88" /> <!-- Pommel -->
+
+</vector>

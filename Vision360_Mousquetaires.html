@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dartagnan Vision 360° - Conseil des Mousquetaires</title>
+    <style>
+        :root {
+            --blue-royal: #002366;
+            --gold: #FFD700;
+            --bg: #0a0a0a;
+            --card-bg: #1a1a1a;
+            --text: #e0e0e0;
+        }
+
+        .mermaid {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--gold);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        h1 { color: var(--gold); margin: 0; font-variant: small-caps; }
+
+        .config-bar {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .mousquetaires-list {
+            display: flex;
+            gap: 15px;
+        }
+
+        .mousquetaire-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border: 1px solid #444;
+            border-radius: 20px;
+            transition: 0.3s;
+        }
+
+        .mousquetaire-item.active {
+            border-color: var(--gold);
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .main-container {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .archive-panel {
+            width: 200px;
+            background: var(--card-bg);
+            border-left: 2px solid var(--gold);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: auto;
+        }
+
+        .archive-item {
+            padding: 8px;
+            background: #222;
+            border-radius: 4px;
+            font-size: 0.8em;
+            cursor: pointer;
+            border: 1px solid #333;
+        }
+        .archive-item:hover { border-color: var(--gold); }
+
+        .input-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 400px;
+        }
+
+        /* Zone de Dépôt d'Images */
+        #dropZone {
+            border: 2px dashed #444;
+            padding: 20px;
+            text-align: center;
+            background: #111;
+            color: #888;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        #dropZone.dragover { border-color: var(--gold); background: rgba(255, 215, 0, 0.05); color: var(--gold); }
+        #imagePreview { max-width: 100%; max-height: 150.px; margin-top: 10px; display: none; border-radius: 4px; }
+
+        textarea {
+            flex: 1;
+            background: #222;
+            color: white;
+            border: 1px solid #444;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Consolas', monospace;
+            resize: none;
+        }
+
+        .btn-group { display: flex; gap: 10px; }
+
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .btn-send { background: var(--gold); color: black; flex: 2; }
+        .btn-send:hover { background: #e6c200; }
+        .btn-file { background: #444; color: white; flex: 1; }
+
+        .responses-grid {
+            flex: 2;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .response-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 15px;
+            border-top: 4px solid var(--blue-royal);
+            position: relative;
+        }
+
+        .response-card h3 {
+            margin-top: 0;
+            color: var(--gold);
+            font-size: 0.9em;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+        }
+
+        .copy-btn {
+            margin-left: auto;
+            background: transparent;
+            border: 1px solid #444;
+            color: #888;
+            font-size: 0.7em;
+            padding: 2px 5px;
+        }
+        .copy-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .response-content {
+            font-size: 0.95em;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .loader {
+            display: none;
+            color: var(--gold);
+            text-align: center;
+            font-style: italic;
+            margin: 10px 0;
+        }
+
+        /* Animation Épée de Lumière de Buckingham */
+        .sword-container {
+            display: inline-block;
+            width: 30px;
+            height: 40px;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+        .sword-svg { width: 100%; height: 100%; overflow: visible; }
+
+        .blade { fill: #333; transition: 0.5s; }
+        .guard { fill: #8B4513; transition: 0.5s; }
+        .pommel { fill: var(--gold); transition: 0.5s; }
+
+        /* ÉTAT 1 : REÇU (La garde s'éveille) */
+        .state-received .guard { fill: #00bfff; filter: drop-shadow(0 0 5px #00bfff); }
+
+        /* ÉTAT 2 : RÉFLEXION (Lumière fluide le long de la lame) */
+        .state-thinking .blade {
+            fill: url(#shineGradient);
+            filter: drop-shadow(0 0 5px var(--gold));
+            animation: lightFlow 1s linear infinite;
+        }
+
+        /* ÉTAT 3 : TERMINÉ (Éclat fixe et étincelant) */
+        .state-done .blade {
+            fill: #FFF;
+            filter: drop-shadow(0 0 8px #FFF) drop-shadow(0 0 15px var(--gold));
+        }
+        .state-done .sword-svg {
+            animation: sparkle 2s ease-in-out infinite;
+        }
+
+        @keyframes lightFlow {
+            0% { fill-opacity: 0.3; transform: translateY(2px); }
+            50% { fill-opacity: 1; transform: translateY(-2px); }
+            100% { fill-opacity: 0.3; transform: translateY(2px); }
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 1; filter: brightness(1); }
+            50% { opacity: 0.8; filter: brightness(1.5); }
+        }
+
+        .status-icon { float: right; font-size: 1.2em; transition: 0.5s; }
+        .status-pending { color: #555; }
+        .status-done { color: #00ff00; }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+    </style>
+    <!-- Moteurs de Rendu : Texte (Marked) et Images (Mermaid) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+    </script>
+</head>
+<body>
+
+<header>
+    <h1>⚔️ Vision 360° : Le Conseil des Mousquetaires ⚔️</h1>
+</header>
+
+<div class="config-bar" id="statusBar">
+    <div style="display: flex; align-items: center; gap: 15px; width: 100%;">
+        <button id="btnLaunch" onclick="startAllSystems()" style="background: var(--gold); color: black; padding: 10px 20px; font-weight: bold; border-radius: 5px;">🚀 ALLUMER L'ARSENAL</button>
+        <div id="statusOllama" style="font-size: 0.8em; color: #ff4444;">🧠 Ollama: Hors ligne</div>
+        <div id="statusBridge" style="font-size: 0.8em; color: #ff4444;">🔱 Pont Royal: Hors ligne</div>
+        <div style="flex: 1;"></div>
+        <div class="mousquetaires-list" id="modelList"></div>
+    </div>
+</div>
+
+<div class="main-container">
+    <div class="input-area">
+        <div style="display: flex; gap: 5px;">
+            <input type="text" id="archiveIndex" placeholder="Index archive à rappeler (Optionnel)" style="flex: 1; background: #222; color: var(--gold); border: 1px solid #444; padding: 5px; border-radius: 4px;">
+            <button onclick="recallArchive()" style="background: var(--blue-royal); color: var(--gold); font-size: 0.8em;">📖 RAPPEL</button>
+        </div>
+        <textarea id="promptInput" placeholder="Exposez votre problématique ici..."></textarea>
+
+        <div id="dropZone" ondragover="this.className='dragover'; event.preventDefault();" ondragleave="this.className='';" ondrop="handleDrop(event)">
+            🖼️ GLISSEZ UNE IMAGE ICI
+            <img id="imagePreview" src="">
+        </div>
+
+        <input type="file" id="fileInput" style="display: none;" onchange="handleFile(this)">
+        <div class="btn-group">
+            <button class="btn-file" onclick="document.getElementById('fileInput').click()">📁 Fichier</button>
+            <button class="btn-send" onclick="askAll()">LANCER LA CONSULTATION</button>
+        </div>
+        <div class="btn-group">
+            <button class="btn-file" style="background: #4b0082;" onclick="cleanAndArchive()">🧹 ARCHIVER</button>
+            <button class="btn-file" style="background: #8b0000;" onclick="justTrash()">🗑️ JETER</button>
+        </div>
+        <button id="btnSynthese" onclick="generateSynthese()" style="display:none; background: #8B0000; color: white; width: 100%; margin-top: 10px; padding: 10px; border-radius: 5px; font-weight: bold; border: 1px solid var(--gold);">🔱 GÉNÉRER LA SYNTHÈSE SUPRÊME</button>
+        <button id="btnAuthorizeAll" onclick="authorizeAll()" style="display:none; background: #006400; color: white; width: 100%; margin-top: 10px; padding: 15px; border-radius: 5px; font-weight: bold; border: 2px solid #00ff00; font-size: 1.1em;">🔱 AUTORISER LE SIÈGE (APPLIQUER TOUT)</button>
+        <div id="globalLoader" class="loader">Les mousquetaires dégainent leurs cerveaux...</div>
+    </div>
+
+    <div class="responses-grid" id="responsesGrid">
+        <!-- Réponses ici -->
+    </div>
+
+    <div class="archive-panel">
+        <h3 style="color: var(--gold); font-size: 0.9em; margin: 0;">📚 GRIMOIRES</h3>
+        <div id="archiveList" style="display: flex; flex-direction: column; gap: 5px;">
+            Chargement...
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #333; margin: 15px 0;">
+
+        <h3 style="color: #00bfff; font-size: 0.9em; margin: 0;">☁️ LE DUC DE BUCKINGHAM (GEMINI)</h3>
+        <p style="font-size: 0.7em; color: #888;">Collez ici l'expertise de l'IA d'Android Studio pour l'inclure à la synthèse :</p>
+        <textarea id="geminiInput" placeholder="Collez ma réponse ici..." style="width: 100%; height: 100px; background: #000; color: #00bfff; border: 1px solid #004466; font-size: 0.8em;"></textarea>
+    </div>
+</div>
+
+<div class="shell-console">
+    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+        <span style="color: var(--gold); font-weight: bold;">⚡ CONSOLE DE COMMANDEMENT :</span>
+        <input type="text" id="shellInput" placeholder="Ex: pull llava, rm mistral..." style="flex: 1; background: #000; color: #0f0; border: 1px solid #333; padding: 5px; font-family: monospace;">
+        <button onclick="executeShell()" style="background: #333; color: white; padding: 5px 15px;">EXÉCUTER</button>
+    </div>
+    <div id="shellOutput" style="font-family: monospace; font-size: 0.85em; color: #888; background: #050505; padding: 10px; border-radius: 4px; max-height: 100px; overflow-y: auto;">
+        Système prêt. En attente d'ordres...
+    </div>
+</div>
+
+<script>
+    const OLLAMA_URL = 'http://localhost:11434/api/chat';
+    const OLLAMA_GEN_URL = 'http://localhost:11434/api/generate';
+    let availableModels = [];
+    const mapping = {
+        'llama3:latest': 'Dartagnan (Leader)',
+        'mistral:latest': 'Aramis (L\'Érudit)',
+        'phi3:latest': 'Athos (Le Sage)',
+        'gemma2:latest': 'Porthos (La Force)',
+        'codestral:latest': 'M. de Tréville (L\'Expert Code)'
+    };
+
+    let collectiveContext = "";
+
+    async function cleanAndArchive() {
+        const grid = document.getElementById('responsesGrid');
+        const prompt = document.getElementById('promptInput').value;
+        if (!prompt && grid.innerHTML === "") return;
+
+        const data = {
+            prompt: prompt,
+            responses: Array.from(grid.querySelectorAll('.response-card')).map(c => ({
+                name: c.querySelector('h3').innerText,
+                content: c.querySelector('.response-content').innerText
+            }))
+        };
+
+        try {
+            await fetch('http://localhost:8081/archive', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `content=${encodeURIComponent(JSON.stringify(data, null, 2))}`
+            });
+        } catch (e) {}
+
+        // Nettoyage
+        document.getElementById('promptInput').value = "";
+        grid.innerHTML = "";
+        document.getElementById('btnSynthese').style.display = 'none';
+        document.getElementById('btnAuthorizeAll').style.display = 'none';
+        alert("🧹 Écran nettoyé et conversation archivée sur le Bureau !");
+    }
+
+    async function recallArchive(forcedId = null) {
+        const id = forcedId || document.getElementById('archiveIndex').value.trim();
+        if (!id) return;
+        try {
+            const r = await fetch(`http://localhost:8081/archive/${id}`);
+            if (r.ok) {
+                const data = await r.json();
+                document.getElementById('promptInput').value = `[RAPPEL ARCHIVE #${id}]\nAncien sujet: ${data.prompt}\n\nNouveau sujet: `;
+                alert("📖 Archive chargée dans le contexte !");
+            } else { alert("Archive introuvable."); }
+        } catch (e) { alert("Erreur de rappel."); }
+    }
+
+    async function fetchArchives() {
+        const container = document.getElementById('archiveList');
+        try {
+            const r = await fetch('http://localhost:8081/archives');
+            if (!r.ok) throw new Error();
+            const ids = await r.json();
+
+            container.innerHTML = '';
+            if (!ids || ids.length === 0) {
+                container.innerHTML = "<div style='font-size:0.8em; color:#666; padding:10px;'>Aucune archive (0)</div>";
+                return;
+            }
+
+            ids.forEach(id => {
+                const div = document.createElement('div');
+                div.className = 'archive-item';
+                div.innerText = `#${id}`;
+                div.onclick = () => recallArchive(id);
+                container.appendChild(div);
+            });
+        } catch (e) {
+            container.innerHTML = "<div style='font-size:0.8em; color:#ff4444; padding:10px;'>Pont Royal non détecté</div>";
+        }
+    }
+
+    function justTrash() {
+        if (confirm("🗑️ Voulez-vous vraiment jeter cette conversation sans l'archiver ?")) {
+            document.getElementById('promptInput').value = "";
+            document.getElementById('responsesGrid').innerHTML = "";
+            document.getElementById('btnSynthese').style.display = 'none';
+            document.getElementById('btnAuthorizeAll').style.display = 'none';
+        }
+    }
+
+    async function startAllSystems() {
+        const btn = document.getElementById('btnLaunch');
+        btn.innerText = "⏳ ANALYSE EN COURS...";
+
+        // 1. Tester Ollama
+        try {
+            const r = await fetch('http://localhost:11434/api/tags');
+            if(r.ok) {
+                document.getElementById('statusOllama').innerText = "🧠 Ollama: Prêt";
+                document.getElementById('statusOllama').style.color = "#00ff00";
+            }
+        } catch(e) {
+            alert("ERREUR : Ollama n'est pas lancé.\n\nAction : Ouvrez un terminal et tapez :\n$env:OLLAMA_ORIGINS='*'; ollama serve");
+        }
+
+        // 2. Tester le Pont Royal
+        try {
+            const r = await fetch('http://localhost:8081/archives');
+            if(r.ok) {
+                document.getElementById('statusBridge').innerText = "🔱 Pont Royal: Prêt";
+                document.getElementById('statusBridge').style.color = "#00ff00";
+            }
+        } catch(e) {
+            alert("ERREUR : Le Pont Royal n'est pas lancé.\n\nAction : Dans Android Studio, faites un clic droit sur DartagnanBridge.kt et choisissez RUN.");
+        }
+
+        fetchModels();
+        btn.innerText = "✅ ARSENAL OPÉRATIONNEL";
+        btn.style.background = "#006400";
+        btn.style.color = "white";
+    }
+
+    async function fetchModels() {
+        fetchArchives(); // Charger les archives aussi
+        try {
+            const r = await fetch('http://localhost:11434/api/tags');
+            const data = await r.json();
+            availableModels = data.models;
+            renderModelList();
+        } catch (e) {
+            document.getElementById('modelList').innerHTML = "Erreur: Ollama est-il lancé ?";
+        }
+    }
+
+    function renderModelList() {
+        const container = document.getElementById('modelList');
+        container.innerHTML = '';
+        availableModels.forEach(m => {
+            const nickname = mapping[m.name] || m.name;
+            const div = document.createElement('div');
+            div.className = 'mousquetaire-item active';
+            div.innerHTML = `<input type="checkbox" checked data-model="${m.name}"> ${nickname}`;
+            div.onclick = (e) => {
+                if(e.target.tagName !== 'INPUT') {
+                    const cb = div.querySelector('input');
+                    cb.checked = !cb.checked;
+                }
+            };
+            container.appendChild(div);
+        });
+    }
+
+    let currentImageData = null;
+
+    function handleDrop(e) {
+        e.preventDefault();
+        document.getElementById('dropZone').className = '';
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                currentImageData = event.target.result.split(',')[1]; // Base64 pur
+                const img = document.getElementById('imagePreview');
+                img.src = event.target.result;
+                img.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    async function askAll() {
+        const prompt = document.getElementById('promptInput').value;
+        if (!prompt) return;
+
+        const selectedCbs = document.querySelectorAll('#modelList input:checked');
+        const grid = document.getElementById('responsesGrid');
+        grid.innerHTML = '';
+        document.getElementById('globalLoader').style.display = 'block';
+
+        const cbs = Array.from(selectedCbs);
+        let collectiveContext = ""; // La mémoire de la table ronde
+
+        for (let i = 0; i < cbs.length; i++) {
+            const modelName = cbs[i].getAttribute('data-model');
+            const nickname = mapping[modelName] || modelName;
+
+            // On envoie le prompt d'origine ET ce que les autres ont déjà dit
+            const responseText = await askOneWithCritique(modelName, nickname, prompt, collectiveContext);
+            collectiveContext += `\n[L'AVIS DE ${nickname}]:\n${responseText}\n`;
+        }
+
+        document.getElementById('globalLoader').style.display = 'none';
+        document.getElementById('btnSynthese').style.display = 'block';
+    }
+
+    async function askOneWithCritique(model, nickname, userPrompt, context) {
+        const grid = document.getElementById('responsesGrid');
+        const card = document.createElement('div');
+        card.className = 'response-card';
+        const cardId = `res-${model.replace(':','-')}`;
+        const swordId = `sword-${model.replace(':','-')}`;
+
+        card.innerHTML = `
+            <span id="icon-${model.replace(':','-')}" class="status-icon"></span>
+            <h3>
+                <div class="sword-container" id="${swordId}">
+                    <svg class="sword-svg" viewBox="0 0 20 100">
+                        <defs>
+                            <linearGradient id="shineGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+                                <stop offset="0%" stop-color="#777" />
+                                <stop offset="50%" stop-color="#FFF" />
+                                <stop offset="100%" stop-color="#777" />
+                            </linearGradient>
+                        </defs>
+                        <path class="blade" d="M10 5 L13 85 L7 85 Z" />
+                        <rect class="guard" x="3" y="85" width="14" height="4" rx="2" />
+                        <rect class="hilt" x="8" y="89" width="4" height="8" fill="#5D2906" />
+                        <circle class="pommel" cx="10" cy="98" r="2" />
+                    </svg>
+                </div>
+                ${nickname}
+                <div style="margin-left: auto; display: flex; gap: 5px;">
+                    <button class="copy-btn" onclick="copyToClipboard('${cardId}')">COPIER</button>
+                    <button class="copy-btn" onclick="saveToDesktop('${nickname}', '${cardId}')">🔱 DÉPOSER</button>
+                    <button class="copy-btn" style="border-color: #00ff00; color: #00ff00;" onclick="applyToProject('${cardId}')">🔱 APPLIQUER</button>
+                    <button class="copy-btn" style="border-color: #ff00ff; color: #ff00ff;" onclick="openForge('${cardId}')">🔨 FORGER</button>
+                </div>
+            </h3>
+            <div class="response-content" id="${cardId}">Analyse en cours...</div>
+        `;
+        grid.appendChild(card);
+
+        const sword = document.getElementById(swordId);
+        sword.classList.add('state-received');
+
+        const systemMsg = "Tu es un mousquetaire du code, expert senior. Réponds UNIQUEMENT en français. Si tu vois une image, analyse-la avec précision. Si tu proposes du code, utilise // PATH: chemin/du/fichier.kt.";
+        const instruction = context === ""
+            ? "Analyse ce problème (et l'image si présente) en tant qu'expert senior. RÉPONDS EXCLUSIVEMENT EN FRANÇAIS."
+            : `Voici le problème : "${userPrompt}". Tes collègues ont déjà proposé des solutions. Analyse-les et apporte ta propre expertise. RÉPONDS EXCLUSIVEMENT EN FRANÇAIS.\n\nCONTEXTE DES COLLÈGUES :\n${context}`;
+
+        const payload = {
+            model: model,
+            messages: [
+                { role: 'system', content: systemMsg },
+                { role: 'user', content: instruction + "\n\nPROBLÈME : " + userPrompt }
+            ],
+            stream: false
+        };
+
+        if (currentImageData) {
+            payload.images = [currentImageData];
+        }
+
+        try {
+            sword.classList.remove('state-received');
+            sword.classList.add('state-thinking');
+
+            const response = await fetch(OLLAMA_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            const content = data.message.content;
+
+            // Rendu propre du Markdown (Texte + Code)
+            document.getElementById(cardId).innerHTML = marked.parse(content);
+
+            // Rendu des diagrammes Mermaid UNIQUEMENT si la classe .mermaid est présente
+            const mermaidNodes = document.getElementById(cardId).querySelectorAll('.mermaid');
+            if (mermaidNodes.length > 0) {
+                try {
+                    await mermaid.run({ nodes: mermaidNodes });
+                } catch(e) { console.log("Erreur diagramme"); }
+            }
+
+            sword.classList.remove('state-thinking');
+            sword.classList.add('state-done');
+            document.getElementById(`icon-${model.replace(':','-')}`).innerText = '✅';
+            return content;
+        } catch (e) {
+            document.getElementById(cardId).innerText = "Erreur de communication.";
+            sword.style.opacity = "0.3";
+            document.getElementById(`icon-${model.replace(':','-')}`).innerText = '❌';
+            return "";
+        }
+    }
+
+    async function generateSynthese() {
+        const grid = document.getElementById('responsesGrid');
+        const cards = grid.querySelectorAll('.response-card');
+        let allResponses = "";
+
+        cards.forEach(card => {
+            const name = card.querySelector('h3').innerText;
+            const text = card.querySelector('.response-content').innerText;
+            allResponses += `--- RÉPONSE DE ${name} ---\n${text}\n\n`;
+        });
+
+        // INCLUSION DE L'AVIS DU DUC (GEMINI)
+        const geminiAvis = document.getElementById('geminiInput').value.trim();
+        if (geminiAvis) {
+            allResponses += `--- EXPERTISE DU DUC DE BUCKINGHAM (IA ANDROID STUDIO) ---\n${geminiAvis}\n\n`;
+        }
+
+        // On crée une nouvelle carte pour la synthèse
+        const syntheseCard = document.createElement('div');
+        syntheseCard.className = 'response-card';
+        syntheseCard.style.gridColumn = "1 / -1"; // Prend toute la largeur
+        syntheseCard.style.borderColor = "#8B0000";
+        syntheseCard.innerHTML = `<h3 style="color:#FF4500">🔱 SYNTHÈSE SUPRÊME (CONSEIL DU ROI)</h3><div class="response-content" id="res-synthese">Analyse des rapports en cours...</div>`;
+        grid.prepend(syntheseCard);
+
+        try {
+            const promptSynthese = `Tu es le Cardinal de Richelieu, stratège suprême. Voici les rapports de tes mousquetaires sur une question technique.
+            1. Fais-en une synthèse critique EN FRANÇAIS.
+            2. ÉTABLIS UN PLAN D'ACTION CLAIR : liste chaque fichier à modifier avec son chemin (PATH).
+            3. DONNE LE CODE FINAL COMPLET pour chaque fichier concerné, en commençant chaque bloc par // PATH: chemin/du/fichier.kt.
+
+            CONSEILS DES MOUSQUETAIRES :\n${allResponses}`;
+
+            const response = await fetch(OLLAMA_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    model: 'codestral:latest',
+                    messages: [{ role: 'user', content: promptSynthese }],
+                    stream: false
+                })
+            });
+            const data = await response.json();
+            document.getElementById('res-synthese').innerText = data.message.content;
+            document.getElementById('btnAuthorizeAll').style.display = 'block';
+        } catch (e) {
+            document.getElementById('res-synthese').innerText = "Le Cardinal est indisponible pour le moment.";
+        }
+    }
+
+    async function authorizeAll() {
+        const syntheseContent = document.getElementById('res-synthese').innerText;
+        // On extrait tous les blocs qui commencent par // PATH:
+        const blocks = syntheseContent.split(/\/\/ PATH: /).slice(1);
+
+        if (blocks.length === 0) {
+            alert("Aucun fichier détecté dans la synthèse. Vérifiez que le Cardinal a bien indiqué les chemins (// PATH: ...)");
+            return;
+        }
+
+        if (confirm(`⚠️ ATTENTION : Vous allez appliquer ${blocks.length} modification(s) simultanément sur votre projet. Confirmer l'ordre d'attaque ?`)) {
+            for (let block of blocks) {
+                const lines = block.split('\n');
+                const path = lines[0].trim();
+                const content = lines.slice(1).join('\n').trim();
+
+                await saveRequest('apply', path, content);
+            }
+            alert("🏰 SIÈGE TERMINÉ : Le projet a été mis à jour selon les ordres du Cardinal !");
+        }
+    }
+
+    async function executeShell() {
+        const cmd = document.getElementById('shellInput').value.trim();
+        const out = document.getElementById('shellOutput');
+
+        if (cmd.startsWith('pull ')) {
+            const model = cmd.replace('pull ', '');
+            out.innerHTML = `> Téléchargement de ${model} lancé... (Vérifiez votre terminal Ollama)`;
+            try {
+                fetch('http://localhost:11434/api/pull', {
+                    method: 'POST',
+                    body: JSON.stringify({ name: model })
+                });
+            } catch(e) {}
+        } else if (cmd === 'list') {
+            fetchModels();
+            out.innerHTML = `> Liste des modèles actualisée.`;
+        } else {
+            out.innerHTML = `> Commande '${cmd}' envoyée au système.`;
+        }
+    }
+
+    async function askOne(model, nickname, prompt) {
+        const grid = document.getElementById('responsesGrid');
+        const card = document.createElement('div');
+        card.className = 'response-card';
+        card.innerHTML = `<h3>${nickname}</h3><div class="response-content" id="res-${model.replace(':','-')}">En attente...</div>`;
+        grid.appendChild(card);
+
+        try {
+            const response = await fetch(OLLAMA_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    model: model,
+                    messages: [
+                        { role: 'system', content: 'Tu es un ingénieur senior expert. Réponds avec précision.' },
+                        { role: 'user', content: prompt }
+                    ],
+                    stream: false
+                })
+            });
+            const data = await response.json();
+            document.getElementById(`res-${model.replace(':','-')}`).innerText = data.message.content;
+        } catch (e) {
+            document.getElementById(`res-${model.replace(':','-')}`).innerText = "Erreur de communication.";
+        }
+    }
+
+    function handleFile(input) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            document.getElementById('promptInput').value += `\n\n--- CONTENU DU FICHIER (${file.name}) ---\n${e.target.result}`;
+        };
+        reader.readAsText(file);
+    }
+
+    function copyToClipboard(id) {
+        const text = document.getElementById(id).innerText;
+        navigator.clipboard.writeText(text);
+        alert("Copié dans le presse-papier !");
+    }
+
+    async function saveToDesktop(nickname, id) {
+        const content = document.getElementById(id).innerText;
+        // Détection intelligente de l'extension
+        let extension = ".txt";
+        if (content.includes(",") && content.includes("\n")) extension = ".csv";
+
+        const defaultName = `${nickname.replace(/ /g, '_')}_${Date.now()}${extension}`;
+        const fileName = prompt("Nom du fichier à déposer sur le bureau :", defaultName);
+
+        if (!fileName) return;
+
+        try {
+            const response = await fetch('http://localhost:8081/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `name=${encodeURIComponent(fileName)}&content=${encodeURIComponent(content)}`
+            });
+            const msg = await response.text();
+            alert(msg);
+        } catch (e) {
+            alert("Erreur: Le Pont Royal n'est pas actif.");
+        }
+    }
+
+    async function applyToProject(id) {
+        const content = document.getElementById(id).innerText;
+        // On cherche le PATH dans le commentaire de l'IA
+        const pathMatch = content.match(/\/\/ PATH: ([^\s]+)/);
+        const path = pathMatch ? pathMatch[1] : "";
+
+        if (!path) {
+            const manualPath = prompt("L'IA n'a pas précisé le chemin. Vers quel fichier appliquer ? (ex: app/src/main/java/com/vahan/dartagnan/MainActivity.kt)", "");
+            if (!manualPath) return;
+            saveRequest('apply', manualPath, content);
+        } else {
+            if (confirm(`Voulez-vous vraiment écraser le fichier : ${path} ?`)) {
+                saveRequest('apply', path, content);
+            }
+        }
+    }
+
+    async function saveRequest(endpoint, path, content) {
+        try {
+            const response = await fetch(`http://localhost:8081/${endpoint}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `path=${encodeURIComponent(path)}&content=${encodeURIComponent(content)}`
+            });
+            const msg = await response.text();
+            alert(msg);
+        } catch (e) {
+            alert("Erreur: Le Pont Royal n'est pas actif.");
+        }
+    }
+
+    function openForge(id) {
+        const cmd = prompt("Entrez la commande de forge (ex: ffmpeg -i input.mp4 output.mp3 ou pandoc file.md -o file.pdf)", "");
+        if (cmd) {
+            forgeRequest(cmd);
+        }
+    }
+
+    async function forgeRequest(command) {
+        try {
+            const response = await fetch('http://localhost:8081/forge', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `command=${encodeURIComponent(command)}`
+            });
+            const msg = await response.text();
+            alert(msg);
+        } catch (e) {
+            alert("Erreur de Forge.");
+        }
+    }
+
+    fetchModels();
+</script>
+
+</body>
+</html>

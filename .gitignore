@@ -1,0 +1,23 @@
+# Android Studio / Gradle
+.gradle
+/build
+/app/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+.idea/workspace.xml
+.idea/libraries
+.idea/modules.xml
+.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+*.iml
+.deviceExplorer
+.stacktrace
+
+# Dartagnan specific
+Dartagnan_Rendus/
+Dartagnan_Archives/
+.env
