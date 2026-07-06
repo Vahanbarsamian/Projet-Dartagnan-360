@@ -1,5 +1,10 @@
 package com.vahan.dartagnan
 
+import io.ktor.client.*
+import io.ktor.client.engine.okhttp.*
+import io.ktor.client.plugins.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -16,7 +21,15 @@ fun main() {
     val userHome = System.getProperty("user.home") ?: ""
     val projectRoot = System.getProperty("user.dir") ?: ""
     
-    // Detection dynamique du bureau (Standard ou OneDrive)
+    // CONFIGURATION DU CLIENT AVEC PATIENCE INFINIE (Timeout)
+    val client = HttpClient(OkHttp) {
+        install(HttpTimeout) {
+            requestTimeoutMillis = 600000 // 10 minutes d'attente
+            connectTimeoutMillis = 600000
+            socketTimeoutMillis = 600000
+        }
+    }
+
     var desktopPath = File(userHome, "Desktop")
     if (File(userHome, "OneDrive/Bureau").exists()) desktopPath = File(userHome, "OneDrive/Bureau")
     else if (File(userHome, "OneDrive/Desktop").exists()) desktopPath = File(userHome, "OneDrive/Desktop")
@@ -27,9 +40,7 @@ fun main() {
     if (!archivesDir.exists()) archivesDir.mkdirs()
     if (!File(desktopDir).exists()) File(desktopDir).mkdirs()
 
-    println("🔱 LE PONT ROYAL EST ACTIF")
-    println("📂 Dossier Rendus : $desktopDir")
-    println("📚 Dossier Archives : ${archivesDir.absolutePath}")
+    println("🔱 LE PONT ROYAL V5.2 EST ACTIF (Mode Patience Infinie)")
 
     embeddedServer(Netty, port = 8081) {
         install(CORS) {
@@ -47,58 +58,57 @@ fun main() {
             post("/save") { saveFile(call, desktopDir) }
             post("/apply") { saveFile(call, projectRoot) }
             
+            post("/ollama/chat") {
+                val body = call.receiveText()
+                try {
+                    val response: HttpResponse = client.post("http://127.0.0.1:11434/api/chat") {
+                        setBody(body)
+                    }
+                    call.respondText(response.bodyAsText(), ContentType.Application.Json)
+                } catch (e: Exception) {
+                    println("❌ Erreur Ollama : ${e.message}")
+                    call.respondText("{\"error\":\"Ollama a mis trop de temps a repondre\"}", ContentType.Application.Json, HttpStatusCode.GatewayTimeout)
+                }
+            }
+
+            get("/ollama/tags") {
+                try {
+                    val response: HttpResponse = client.get("http://127.0.0.1:11434/api/tags")
+                    call.respondText(response.bodyAsText(), ContentType.Application.Json)
+                } catch (e: Exception) {
+                    call.respondText("{\"models\":[]}", ContentType.Application.Json)
+                }
+            }
+
             post("/archive") {
                 val params = call.receiveParameters()
                 val content = params["content"] ?: ""
                 val index = java.text.SimpleDateFormat("yyyyMMdd_HHmmss").format(java.util.Date())
-                if (!archivesDir.exists()) archivesDir.mkdirs()
                 File(archivesDir, "archive_$index.json").writeText(content)
-                call.respondText("📚 Archive #$index sauvegardée !")
+                call.respondText("📚 Archive sauvegardée !")
             }
 
             get("/archives") {
-                if (!archivesDir.exists()) {
-                    call.respond(emptyList<String>())
-                } else {
-                    val files = archivesDir.listFiles { _, name -> name.endsWith(".json") }
-                        ?.map { it.name.removePrefix("archive_").removeSuffix(".json") }
-                        ?.sortedDescending() ?: emptyList()
-                    call.respond(files)
-                }
-            }
-            
-            get("/archive/{id}") {
-                val id = call.parameters["id"]
-                val file = File(archivesDir, "archive_$id.json")
-                if (file.exists()) {
-                    call.respondText(file.readText())
-                } else {
-                    call.respondText("Archive introuvable", status = HttpStatusCode.NotFound)
-                }
+                val files = archivesDir.listFiles { _, name -> name.endsWith(".json") }
+                    ?.map { it.name.removePrefix("archive_").removeSuffix(".json") }
+                    ?.sortedDescending() ?: emptyList()
+                call.respond(files)
             }
 
             post("/forge") {
                 val params = call.receiveParameters()
                 val command = params["command"] ?: ""
                 try {
-                    // On detecte si c'est un lancement de service (comme ollama) pour ne pas bloquer
                     val isService = command.contains("serve") || command.contains("start")
-                    val process = if (isService) {
-                        Runtime.getRuntime().exec("cmd /c start /min $command")
-                    } else {
-                        Runtime.getRuntime().exec(command)
-                    }
-                    
                     if (isService) {
-                        call.respondText("⚡ Service lancé en arrière-plan.")
+                        Runtime.getRuntime().exec("cmd /c start /min $command")
+                        call.respondText("⚡ Service lancé.")
                     } else {
+                        val process = Runtime.getRuntime().exec(command)
                         val result = process.waitFor()
-                        if (result == 0) call.respondText("✅ Forge réussie.")
-                        else call.respondText("❌ Erreur code $result", status = HttpStatusCode.InternalServerError)
+                        call.respondText(if (result == 0) "✅ Forge réussie." else "❌ Erreur $result")
                     }
-                } catch (e: Exception) {
-                    call.respondText("❌ Erreur : ${e.message}", status = HttpStatusCode.InternalServerError)
-                }
+                } catch (e: Exception) { call.respondText("❌ Erreur : ${e.message}") }
             }
         }
     }.start(wait = true)
@@ -112,5 +122,5 @@ suspend fun saveFile(call: ApplicationCall, baseDir: String) {
     val targetFile = if (path.isNotEmpty()) File(baseDir, path) else File(baseDir, name)
     targetFile.parentFile?.mkdirs()
     targetFile.writeText(content)
-    call.respondText("🔱 Action réussie : ${targetFile.name}")
+    call.respondText("🔱 Succès : ${targetFile.name}")
 }

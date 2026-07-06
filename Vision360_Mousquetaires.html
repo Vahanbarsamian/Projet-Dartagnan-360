@@ -28,7 +28,6 @@
 
         h1 { color: var(--gold); margin: 0; font-size: 1.2em; font-variant: small-caps; text-align: center; padding-bottom: 5px; border-bottom: 1px solid var(--gold); }
 
-        /* Barre de Lancement Compacte */
         .config-bar {
             background: var(--card-bg);
             padding: 8px 15px;
@@ -75,12 +74,10 @@
             overflow: hidden;
         }
 
-        /* Colonnes */
         .input-area { width: 340px; display: flex; flex-direction: column; gap: 8px; }
         .responses-grid { flex: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 10px; overflow-y: auto; padding-right: 5px; }
         .right-panel { width: 240px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
 
-        /* Composants Saisie */
         textarea { background: #000; color: #fff; border: 1px solid var(--border); padding: 10px; border-radius: 4px; font-family: monospace; font-size: 0.85em; resize: both; }
         #promptInput { height: 120px; min-width: 100%; }
         #geminiInput { height: 60px; min-width: 100%; }
@@ -92,12 +89,10 @@
         .btn-small { padding: 5px; font-size: 0.75em; flex: 1; background: #222; color: #ccc; border: 1px solid #333; cursor: pointer; }
         .btn-gold { background: var(--gold); color: #000; font-weight: bold; border: none; }
 
-        /* Cartes de réponses */
         .response-card { background: #0c0c0c; border: 1px solid var(--border); border-radius: 4px; padding: 10px; position: relative; }
         .response-card h3 { margin: 0 0 8px 0; font-size: 0.75em; color: var(--gold); display: flex; align-items: center; border-bottom: 1px solid #222; padding-bottom: 4px; }
         .response-content { font-size: 0.85em; line-height: 1.4; }
 
-        /* Animation Épée Compacte */
         .sword-container { width: 20px; height: 30px; margin-right: 8px; }
         .sword-svg { width: 100%; height: 100%; overflow: visible; }
         .blade { fill: #222; transition: 0.5s; }
@@ -109,20 +104,16 @@
         .state-done .blade { fill: #FFF; filter: drop-shadow(0 0 10px var(--gold)); }
         @keyframes lightFlow { 0%, 100% { fill-opacity: 0.3; } 50% { fill-opacity: 1; } }
 
-        /* Tooltips et Boutons Action */
         .action-btns { margin-left: auto; display: flex; gap: 4px; }
         .act-btn { background: none; border: 1px solid #333; color: #666; font-size: 0.7em; padding: 2px 4px; cursor: pointer; }
         .act-btn:hover { color: var(--gold); border-color: var(--gold); }
 
-        /* Modal Plein Écran */
         .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); overflow-y: auto; }
         .modal-content { max-width: 900px; margin: 40px auto; background: #111; padding: 30px; border: 1px solid var(--gold); border-radius: 8px; position: relative; }
         .close-modal { position: absolute; right: 20px; top: 10px; font-size: 2em; color: var(--gold); cursor: pointer; }
 
-        /* Scrollbar */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
-
         .mermaid { background: white !important; color: black; border-radius: 4px; margin-top: 10px; }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -138,7 +129,6 @@
         <div id="modelList" class="mousquetaires-list"></div>
     </div>
 
-    <!-- Gradient Global -->
     <svg style="width:0; height:0; position:absolute;">
         <defs>
             <linearGradient id="buckinghamGradient" x1="0%" y1="100%" x2="0%" y2="0%">
@@ -150,64 +140,51 @@
     </svg>
 
     <div class="main-container">
-        <!-- COLONNE GAUCHE : SAISIE -->
         <div class="input-area">
             <div style="display: flex; gap: 5px;">
                 <input type="text" id="archiveIndex" placeholder="Index archive..." style="flex: 1; background: #000; border: 1px solid #333; color: var(--gold); padding: 5px; font-size: 0.75em;">
                 <button class="btn-small" onclick="recallArchive()">📖 RAPPEL</button>
             </div>
-
             <textarea id="promptInput" placeholder="Exposez votre problématique technique..."></textarea>
-
             <div id="dropZone" ondragover="this.className='dragover'; event.preventDefault();" ondragleave="this.className='';" ondrop="handleDrop(event)">
                 🖼️ DÉPÔT IMAGE / SCHÉMA
                 <img id="imagePreview">
             </div>
-
             <input type="file" id="fileInput" style="display: none;" onchange="handleFile(this)">
-
             <div style="display: flex; gap: 5px;">
                 <button class="btn-small" onclick="document.getElementById('fileInput').click()">📁 FICHIER</button>
                 <button class="btn-small btn-gold" onclick="askAll()">LANCER LA CONSULTATION</button>
             </div>
-
             <div style="display: flex; gap: 5px;">
                 <button class="btn-small" style="color: #a0f;" onclick="cleanAndArchive()">🧹 ARCHIVER</button>
                 <button class="btn-small" style="color: #f44;" onclick="justTrash()">🗑️ JETER</button>
                 <button class="btn-small" style="color: #0ff;" onclick="resetInterface()">🎯 RESET</button>
             </div>
-
             <button id="btnSynthese" onclick="generateSynthese()" style="display:none; background: #600; color: #fff; font-size: 0.8em; padding: 10px; border: 1px solid var(--gold);">🔱 GÉNÉRER LA SYNTHÈSE SUPRÊME</button>
             <button id="btnAuthorizeAll" onclick="authorizeAll()" style="display:none; background: #050; color: #fff; font-size: 0.8em; padding: 10px; border: 1px solid #0f0;">🔱 APPLIQUER LES MODIFICATIONS</button>
-
             <div id="globalLoader" style="display:none; font-size: 0.7em; color: var(--gold); text-align: center; font-style: italic;">Consultation en cours...</div>
         </div>
 
-        <!-- CENTRE : RÉSULTATS -->
         <div class="responses-grid" id="responsesGrid"></div>
 
-        <!-- DROITE : PANNEAUX -->
         <div class="right-panel">
             <div style="border: 1px solid var(--border); padding: 8px;">
                 <h4 style="margin:0 0 5px 0; font-size: 0.75em; color: var(--gold);">📚 GRIMOIRES</h4>
                 <div id="archiveList" style="font-size: 0.7em; max-height: 150px; overflow-y: auto;"></div>
             </div>
-
             <div style="border: 1px solid var(--border); padding: 8px; background: #000;">
                 <h4 style="margin:0 0 5px 0; font-size: 0.75em; color: #0f0;">📟 CONSOLE</h4>
                 <div id="shellOutput" style="font-size: 0.65em; color: #666; height: 100px; overflow-y: auto; margin-bottom: 5px;"></div>
                 <input type="text" id="shellInput" value="ollama serve" style="width: 90%; background: transparent; color: #0f0; border: none; font-size: 0.7em; font-family: monospace;">
                 <button class="btn-small" style="width:100%; border-color: #0f0; color: #0f0;" onclick="executeShell()">EXÉCUTER</button>
             </div>
-
             <div style="border: 1px solid var(--border); padding: 8px;">
                 <h4 style="margin:0 0 5px 0; font-size: 0.75em; color: #0bf;">☁️ LE DUC (GEMINI)</h4>
-                <textarea id="geminiInput" placeholder="Expertise Cloud..." style="width: 100%; height: 60px; font-size: 0.7em;"></textarea>
+                <textarea id="geminiInput" placeholder="Expertise Cloud..." style="width: 90%; height: 60px; font-size: 0.7em;"></textarea>
             </div>
         </div>
     </div>
 
-    <!-- MODAL PLEIN ÉCRAN -->
     <div id="fullScreenModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeFullScreen()">&times;</span>
@@ -217,7 +194,7 @@
     </div>
 
     <script>
-        const OLLAMA_URL = 'http://localhost:11434/api/chat';
+        const BRIDGE_URL = 'http://127.0.0.1:8081';
         const roles = {
             'llama3.1:latest': 'GÉNÉRAL DARTAGNAN (Stratégie & Logique)',
             'llama3:latest': 'GÉNÉRAL DARTAGNAN (Stratégie & Logique)',
@@ -226,6 +203,8 @@
             'gemma2:latest': 'GARDE DU CORPS PORTHOS (Sécurité & Matériaux)',
             'codestral:latest': 'M. DE TRÉVILLE (Expertise Code Pur)',
             'deepseek-coder-v2:latest': 'COLBERT (Logicien Critique)',
+            'deepseek-coder-v2:lite': 'COLBERT LITE (Logique & Code)',
+            'qwen2.5-coder:7b': 'VAUBAN CODER (Génie du Code & Architecture)',
             'mathstral:latest': 'PASCAL (Bilans Exergétiques)',
             'qwen2.5:latest': 'VAUBAN (Ingénierie & Fortification)',
             'mistral-nemo:latest': 'LAVOISIER (Physique des Gaz & Plasmas)',
@@ -239,45 +218,49 @@
             'gemma2:latest': 'Porthos',
             'codestral:latest': 'Tréville',
             'deepseek-coder-v2:latest': 'Colbert',
+            'deepseek-coder-v2:lite': 'Colbert',
+            'qwen2.5-coder:7b': 'Vauban',
             'mathstral:latest': 'Pascal',
             'qwen2.5:latest': 'Vauban',
             'mistral-nemo:latest': 'Lavoisier',
             'llava:latest': 'L\'Oeil'
         };
-
         const epicNames = ["Planchet", "Grimaud", "Mousqueton", "Bazin", "Milady", "Rochefort", "Constance", "Lord Winter", "Felton", "Jussac", "Cahusac", "Bernajoux", "Mme de Chevreuse"];
-
         let availableModels = [];
+        let currentImageData = null;
 
         async function startAllSystems() {
             const btn = document.getElementById('btnLaunch');
             const ticker = document.getElementById('systemTicker');
             const log = (msg, status, color = "#888") => ticker.innerHTML = `CMD: ${msg} | STATUT: <span style="color:${color}">${status}</span>`;
-
             btn.innerText = "⏳ INITIALISATION...";
             btn.disabled = true;
 
-            // 1. PONT ROYAL
             try {
-                const r = await fetch('http://localhost:8081/archives');
+                const r = await fetch(`${BRIDGE_URL}/archives`);
                 if(r.ok) log("Pont Royal", "✅ ACTIF", "#0f0");
             } catch(e) {
                 log("Pont Royal", "❌ ABSENT", "#f44");
-                alert("Lancez le Pont Royal via le .bat ou Android Studio !");
+                alert("Lancez le Pont Royal !");
                 btn.innerText = "❌ ÉCHEC"; btn.disabled = false; return;
             }
 
-            // 2. OLLAMA
             try {
-                const r = await fetch('http://localhost:11434/api/tags');
-                if(r.ok) log("Ollama", "✅ PRÊT", "#0f0");
+                const r = await fetch(`${BRIDGE_URL}/ollama/tags`);
+                const data = await r.json();
+                if(data.models && data.models.length > 0) {
+                    log("Ollama", "✅ PRÊT", "#0f0");
+                } else {
+                    log("Ollama", "⚠️ RÉVEIL...", "#fa0");
+                    await executeShell("ollama serve");
+                    await new Promise(res => setTimeout(res, 5000));
+                }
             } catch(e) {
                 log("Ollama", "⚠️ RÉVEIL...", "#fa0");
                 await executeShell("ollama serve");
-                await new Promise(r => setTimeout(r, 5000));
+                await new Promise(res => setTimeout(res, 5000));
             }
 
-            // 3. FINAL
             await fetchModels();
             await fetchArchives();
             ticker.innerHTML = "<b style='color:#0f0'>✨ ARSENAL OPÉRATIONNEL ✨</b>";
@@ -286,28 +269,15 @@
             btn.disabled = false;
         }
 
-        function resetInterface() {
-            document.getElementById('promptInput').style.width = '100%';
-            document.getElementById('promptInput').style.height = '120px';
-            document.getElementById('geminiInput').style.width = '100%';
-            document.getElementById('geminiInput').style.height = '60px';
-        }
-
         async function fetchModels() {
             const container = document.getElementById('modelList');
             try {
-                const r = await fetch('http://localhost:11434/api/tags');
-                if (!r.ok) throw new Error();
+                const r = await fetch(`${BRIDGE_URL}/ollama/tags`);
                 const data = await r.json();
-                availableModels = data.models;
-
-                if (availableModels.length === 0) {
-                    container.innerHTML = "<span style='color:#fa0; font-size:0.8em;'>⚠️ Aucun modèle trouvé. Tapez 'pull llama3.1' dans la console.</span>";
-                    return;
-                }
+                availableModels = data.models || [];
                 renderModelList();
             } catch (e) {
-                container.innerHTML = "<span style='color:#f44; font-size:0.8em;'>❌ Erreur de connexion : Quittez Ollama (barre des tâches) et relancez le .bat</span>";
+                container.innerHTML = "<span style='color:#f44; font-size:0.8em;'>❌ Erreur Pont Royal</span>";
             }
         }
 
@@ -319,32 +289,16 @@
                 const nick = mapping[m.name] || `Soldat ${m.name.split(':')[0]}`;
                 const role = roles[m.name] || "Expert Indépendant";
                 const skill = role.includes('(') ? role.match(/\(([^)]+)\)/)[0] : role;
-
                 const div = document.createElement('div');
                 div.className = 'mousquetaire-item active';
-
-                let baptemeHtml = "";
-                if (!isKnown) {
-                    baptemeHtml = `<select onchange="baptiser('${m.name}', this.value)" style="background:#000; color:var(--gold); border:none; font-size:0.8em; cursor:pointer; margin-left:5px;">
-                        <option value="">🎖️ BAPTISER</option>
-                        ${epicNames.map(name => `<option value="${name}">${name}</option>`).join('')}
-                    </select>`;
-                }
-
-                div.innerHTML = `
-                    <input type="checkbox" checked data-model="${m.name}">
-                    <b>${nick}</b> ${baptemeHtml} <span style="font-size:0.8em; opacity:0.6;">${skill}</span>
-                    <button class="act-btn" onclick="executeShell('pull ${m.name}')" title="Mettre à jour" style="border:none; margin-left:5px;">🔄</button>
-                `;
+                let baptemeHtml = isKnown ? "" : `<select onchange="baptiser('${m.name}', this.value)" style="background:#000; color:var(--gold); border:none; font-size:0.8em; cursor:pointer;"><option value="">🎖️ BAPTISER</option>${epicNames.map(n => `<option value="${n}">${n}</option>`).join('')}</select>`;
+                div.innerHTML = `<input type="checkbox" checked data-model="${m.name}"> <b>${nick}</b> ${baptemeHtml} <span style="font-size:0.8em; opacity:0.6;">${skill}</span> <button class="act-btn" onclick="executeShell('pull ${m.name}')" title="Mise à jour">🔄</button>`;
                 container.appendChild(div);
             });
         }
 
         function baptiser(modelName, newNick) {
-            if (!newNick) return;
-            mapping[modelName] = newNick;
-            alert(`🛡️ Le modèle ${modelName} a été adoubé sous le nom de : ${newNick} !`);
-            renderModelList();
+            if (newNick) { mapping[modelName] = newNick; renderModelList(); }
         }
 
         async function askAll() {
@@ -354,7 +308,6 @@
             const grid = document.getElementById('responsesGrid');
             grid.innerHTML = '';
             document.getElementById('globalLoader').style.display = 'block';
-
             let context = "";
             for (let cb of selected) {
                 const model = cb.getAttribute('data-model');
@@ -363,7 +316,6 @@
                 context += `\n[${nick}]: ${res}\n`;
             }
             document.getElementById('globalLoader').style.display = 'none';
-            document.getElementById('btnSynthese').style.display = 'block';
         }
 
         async function askOneWithCritique(model, nickname, userPrompt, context) {
@@ -372,56 +324,22 @@
             card.className = 'response-card';
             const cardId = `res-${model.replace(':','-')}`;
             const swordId = `sword-${model.replace(':','-')}`;
-
-            card.innerHTML = `
-                <h3>
-                    <div class="sword-container" id="${swordId}">
-                        <svg class="sword-svg" viewBox="0 0 20 100">
-                            <path class="blade" d="M10 5 L13 85 L7 85 Z" />
-                            <rect class="guard" x="3" y="85" width="14" height="4" rx="2" />
-                            <rect class="hilt" x="8" y="89" width="4" height="8" fill="#5D2906" />
-                            <circle class="pommel" cx="10" cy="98" r="2" />
-                        </svg>
-                    </div>
-                    ${nickname}
-                    <div class="action-btns">
-                        <button class="act-btn" title="Plein écran" onclick="openFullScreen('${nickname}', '${cardId}')">⛶</button>
-                        <button class="act-btn" title="Copier" onclick="copyToClipboard('${cardId}')">📋</button>
-                        <button class="act-btn" title="Appliquer" onclick="applyToProject('${cardId}')">🚀</button>
-                    </div>
-                </h3>
-                <div class="response-content" id="${cardId}">Réflexion...</div>
-            `;
+            card.innerHTML = `<h3><div class="sword-container" id="${swordId}"><svg class="sword-svg" viewBox="0 0 20 100"><path class="blade" d="M10 5 L13 85 L7 85 Z" /><rect class="guard" x="3" y="85" width="14" height="4" rx="2" /><rect class="hilt" x="8" y="89" width="4" height="8" fill="#5D2906" /><circle class="pommel" cx="10" cy="98" r="2" /></svg></div>${nickname}<div class="action-btns"><button class="act-btn" onclick="openFullScreen('${nickname}', '${cardId}')">⛶</button><button class="act-btn" onclick="copyToClipboard('${cardId}')">📋</button><button class="act-btn" onclick="applyToProject('${cardId}')">🚀</button></div></h3><div class="response-content" id="${cardId}">Réflexion...</div>`;
             grid.appendChild(card);
-
             const sword = document.getElementById(swordId);
             sword.classList.add('state-received');
-
             const myRole = roles[model] || 'EXPERT SCIENTIFIQUE';
-            const systemMsg = `Tu es ${nickname}, expert ${myRole}.
-            TON ÉTHIQUE : 1. Si un projet de rupture (ex: H2C) est présenté, sois fidèle à sa physique. 2. Pour toute question générale, apporte l'état de l'art. 3. Ne dénigre jamais les méthodes classiques (ex: électrolyse), explique avec noblesse pourquoi elles sont adaptées ou non. Réponds en Français.`;
-
-            const payload = {
-                model: model,
-                messages: [
-                    { role: 'system', content: systemMsg },
-                    { role: 'user', content: (context ? `Contexte: ${context}\n\n` : "") + userPrompt }
-                ],
-                stream: false
-            };
-
+            const systemMsg = `Tu es ${nickname}, expert ${myRole}. 1. Si H2C est présenté, respecte sa physique. 2. Pour toute question générale, apporte l'état de l'art. 3. Pas de dénigrement. Réponds en Français.`;
+            const payload = { model: model, messages: [{ role: 'system', content: systemMsg }, { role: 'user', content: (context ? `Contexte: ${context}\n\n` : "") + userPrompt }], stream: false, options: { num_ctx: 4096, temperature: 0.7 }};
             if (currentImageData) payload.images = [currentImageData];
-
             try {
-                sword.classList.remove('state-received');
-                sword.classList.add('state-thinking');
-                const r = await fetch(OLLAMA_URL, { method: 'POST', body: JSON.stringify(payload) });
+                sword.classList.remove('state-received'); sword.classList.add('state-thinking');
+                const r = await fetch(`${BRIDGE_URL}/ollama/chat`, { method: 'POST', body: JSON.stringify(payload) });
                 const data = await r.json();
                 const content = data.message.content;
                 document.getElementById(cardId).innerHTML = marked.parse(content);
-
-                sword.classList.remove('state-thinking');
-                sword.classList.add('state-done');
+                sword.classList.remove('state-thinking'); sword.classList.add('state-done');
+                document.getElementById('btnSynthese').style.display = 'block';
                 return content;
             } catch (e) {
                 document.getElementById(cardId).innerText = "Erreur.";
@@ -431,35 +349,29 @@
         }
 
         function openFullScreen(nickname, cardId) {
-            document.getElementById('modalTitle').innerText = "RAPPORT DÉTAILLÉ : " + nickname;
+            document.getElementById('modalTitle').innerText = "RAPPORT : " + nickname;
             document.getElementById('modalBody').innerHTML = document.getElementById(cardId).innerHTML;
             document.getElementById('fullScreenModal').style.display = "block";
         }
-
         function closeFullScreen() { document.getElementById('fullScreenModal').style.display = "none"; }
+        function resetInterface() {
+            const pi = document.getElementById('promptInput'); const gi = document.getElementById('geminiInput');
+            pi.style.width = '100%'; pi.style.height = '120px'; gi.style.width = '100%'; gi.style.height = '60px';
+        }
 
-        async function executeShell(customCmd = null) {
-            const cmd = customCmd || document.getElementById('shellInput').value;
+        async function executeShell(cmd) {
             const out = document.getElementById('shellOutput');
-            const log = (m, color="#888") => {
-                const d = document.createElement('div'); d.style.color = color; d.innerText = `> ${m}`; out.prepend(d);
-            };
-
-            log(`Exécution : ${cmd}`, "#0f0");
+            const log = (m, c="#888") => { const d = document.createElement('div'); d.style.color = c; d.innerText = `> ${m}`; out.prepend(d); };
             try {
-                const r = await fetch('http://localhost:8081/forge', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `command=${encodeURIComponent(cmd)}`
-                });
-                log(await r.text());
+                const r = await fetch(`${BRIDGE_URL}/forge`, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `command=${encodeURIComponent(cmd)}` });
+                log(await r.text(), "#0f0");
             } catch (e) { log("Erreur réseau", "#f44"); }
         }
 
         async function fetchArchives() {
             const container = document.getElementById('archiveList');
             try {
-                const r = await fetch('http://localhost:8081/archives');
+                const r = await fetch(`${BRIDGE_URL}/archives`);
                 const ids = await r.json();
                 container.innerHTML = ids.length ? "" : "Aucune archive.";
                 ids.forEach(id => {
@@ -473,62 +385,26 @@
         async function recallArchive(id) {
             const rid = id || document.getElementById('archiveIndex').value;
             if(!rid) return;
-            const r = await fetch(`http://localhost:8081/archive/${rid}`);
-            const d = await r.json();
-            document.getElementById('promptInput').value = `[ARCHIVE #${rid}]\n${d.prompt}`;
+            try {
+                const r = await fetch(`${BRIDGE_URL}/archive/${rid}`);
+                const d = await r.json();
+                document.getElementById('promptInput').value = `[ARCHIVE #${rid}]\n${d.prompt}`;
+            } catch(e) {}
         }
 
         function copyToClipboard(id) { navigator.clipboard.writeText(document.getElementById(id).innerText); alert("Copié !"); }
-
         function handleDrop(e) {
             e.preventDefault(); const file = e.dataTransfer.files[0];
             if (file && file.type.startsWith('image/')) {
                 const reader = new FileReader();
-                reader.onload = (ev) => {
-                    currentImageData = ev.target.result.split(',')[1];
-                    const img = document.getElementById('imagePreview');
-                    img.src = ev.target.result; img.style.display = 'block';
-                };
+                reader.onload = (ev) => { currentImageData = ev.target.result.split(',')[1]; const img = document.getElementById('imagePreview'); img.src = ev.target.result; img.style.display = 'block'; };
                 reader.readAsDataURL(file);
             }
         }
-
         function handleFile(input) {
             const reader = new FileReader();
             reader.onload = (e) => document.getElementById('promptInput').value += `\n\nCONTENU: ${e.target.result}`;
             reader.readAsText(input.files[0]);
-        }
-
-        async function cleanAndArchive() {
-            const grid = document.getElementById('responsesGrid');
-            const prompt = document.getElementById('promptInput').value;
-            if (!prompt && grid.innerHTML === "") return;
-
-            const data = {
-                prompt: prompt,
-                responses: Array.from(grid.querySelectorAll('.response-card')).map(c => ({
-                    name: c.querySelector('h3').innerText,
-                    content: c.querySelector('.response-content').innerText
-                }))
-            };
-
-            try {
-                await fetch('http://localhost:8081/archive', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `content=${encodeURIComponent(JSON.stringify(data, null, 2))}`
-                });
-                alert("🧹 Conversation archivée !");
-            } catch (e) {}
-            grid.innerHTML = "";
-            document.getElementById('btnSynthese').style.display = 'none';
-        }
-
-        function justTrash() {
-            if (confirm("🗑️ Jeter la conversation ?")) {
-                document.getElementById('responsesGrid').innerHTML = "";
-                document.getElementById('btnSynthese').style.display = 'none';
-            }
         }
 
         async function generateSynthese() {
@@ -539,17 +415,13 @@
             cards.forEach(c => all += `--- ${c.querySelector('h3').innerText} ---\n${c.querySelector('.response-content').innerText}\n\n`);
             const gem = document.getElementById('geminiInput').value;
             if(gem) all += `--- DUC DE BUCKINGHAM ---\n${gem}\n\n`;
-
-            const card = document.createElement('div');
-            card.className = 'response-card'; card.style.gridColumn = "1 / -1";
+            const card = document.createElement('div'); card.className = 'response-card'; card.style.gridColumn = "1 / -1";
             card.innerHTML = `<h3 style="color:#f40">🔱 SYNTHÈSE DU CARDINAL</h3><div class="response-content" id="res-syn">Analyse...</div>`;
             grid.prepend(card);
-
-            const prompt = `Tu es le Cardinal de Richelieu, Grand Arbitre. Fais une synthèse CRITIQUE. Si H2C est mentionné, rejette l'électrolyse et focus sur la Triboélectricité. Rapports:\n${all}`;
+            const prompt = `Tu es le Cardinal de Richelieu. Fais une synthèse CRITIQUE. Focus: H2C / Triboélectricité. Rapports:\n${all}`;
             try {
-                const r = await fetch(OLLAMA_URL, { method: 'POST', body: JSON.stringify({ model: 'codestral:latest', messages: [{role:'user', content:prompt}], stream: false }) });
-                const d = await r.json();
-                document.getElementById('res-syn').innerHTML = marked.parse(d.message.content);
+                const r = await fetch(`${BRIDGE_URL}/ollama/chat`, { method: 'POST', body: JSON.stringify({ model: 'codestral:latest', messages: [{role:'user', content:prompt}], stream: false }) });
+                const d = await r.json(); document.getElementById('res-syn').innerHTML = marked.parse(d.message.content);
                 document.getElementById('btnAuthorizeAll').style.display = 'block';
             } catch(e) { document.getElementById('res-syn').innerText = "Erreur."; }
         }
@@ -558,38 +430,24 @@
             const syntheseContent = document.getElementById('res-syn').innerText;
             const blocks = syntheseContent.split(/\/\/ PATH: /).slice(1);
             if (blocks.length === 0) return alert("Aucun fichier détecté.");
-
             if (confirm(`Appliquer ${blocks.length} modifications ?`)) {
                 for (let block of blocks) {
-                    const lines = block.split('\n');
-                    const path = lines[0].trim();
-                    const content = lines.slice(1).join('\n').trim();
-                    await saveRequest('apply', path, content);
+                    const lines = block.split('\n'); const path = lines[0].trim(); const content = lines.slice(1).join('\n').trim();
+                    await fetch(`${BRIDGE_URL}/apply`, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `path=${encodeURIComponent(path)}&content=${encodeURIComponent(content)}` });
                 }
                 alert("🏰 SIÈGE TERMINÉ !");
             }
-        }
-
-        async function saveRequest(endpoint, path, content) {
-            try {
-                await fetch(`http://localhost:8081/${endpoint}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `path=${encodeURIComponent(path)}&content=${encodeURIComponent(content)}`
-                });
-            } catch (e) {}
         }
 
         async function applyToProject(id) {
             const content = document.getElementById(id).innerText;
             const pathMatch = content.match(/\/\/ PATH: ([^\s]+)/);
             const path = pathMatch ? pathMatch[1] : prompt("Chemin du fichier ?");
-            if (path) {
-                if (confirm(`Écraser ${path} ?`)) await saveRequest('apply', path, content);
+            if (path && confirm(`Écraser ${path} ?`)) {
+                await fetch(`${BRIDGE_URL}/apply`, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `path=${encodeURIComponent(path)}&content=${encodeURIComponent(content)}` });
             }
         }
 
-        let currentImageData = null;
         mermaid.initialize({ startOnLoad: false, theme: 'dark' });
     </script>
 </body>
