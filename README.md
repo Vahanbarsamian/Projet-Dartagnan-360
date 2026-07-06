@@ -1,8 +1,15 @@
 # ⚔️ THE MUSKETEER PROTOCOL : DARTAGNAN VISION 360° 🔱
-## *L'Arsenal de l'Ingénierie de Rupture — Version V4.2 "Académie Royale"*
+## *L'Arsenal de l'Ingénierie de Rupture — Version V4.4 "Indestructible"*
+
+> **🔧 DERNIÈRE MISE À JOUR : 29 Octobre 2024 - 01:35**
+> * Suppression du bug critique de connexion (Blocage CORS 403).
+> * Stabilisation du lanceur automatique V4.4 (Auto-CORS).
+> * Optimisation des épées de lumière et du mode plein écran.
+
+[Français](#français) | [English](#english) | [Español](#español)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-gold.svg)](https://opensource.org/licenses/MIT)
-[![Version: 4.2](https://img.shields.io/badge/Version-4.2_Science_Edition-blue.svg)]()
+[![Version: 4.4](https://img.shields.io/badge/Version-4.4_Indestructible-blue.svg)]()
 [![Status: Opérationnel](https://img.shields.io/badge/Status-Arsenal_Prêt_au_Combat-green.svg)]()
 [![Privacy: 100% Local](https://img.shields.io/badge/Confidentialité-100%25_Souveraine-brightgreen.svg)]()
 
@@ -10,14 +17,18 @@
 
 ---
 
-## 🌟 La Vision (Le Défi H2C)
-Le **Musketeer Protocol** n'est pas un simple outil de chat. C'est un **Conseil Scientifique de Rupture** forgé à l'origine pour répondre aux exigences physiques extrêmes du projet **H2C** (Réacteur à Cavitation Hydro-Cinétique). 
+<a name="français"></a>
+## 🇫🇷 NOTICE UNIVERSELLE D'UTILISATION (V4.4)
 
-Face à des technologies de pointe (Triboélectricité, Électrons chauds, Contra-rotation), une IA classique échoue par "biais de normalisation". Dartagnan V4.2 brise ces chaînes en faisant débattre simultanément les meilleurs cerveaux du monde pour extraire une **Vérité Technique Inattaquable**.
+### 🎯 POUR QUI ?
+*   **INGÉNIEURS & SCIENTIFIQUES** : Pour valider des concepts de rupture (H2C) sans fuite de données.
+*   **ÉTUDIANTS** : Pour avoir 5 tuteurs experts qui débattent d'un cours ou d'un exercice.
+*   **CHERCHEURS D'EMPLOI** : Pour analyser des offres, simuler des entretiens techniques et optimiser leur code.
+*   **PASSIONNÉS D'IA** : Pour exploiter la puissance du local gratuitement.
 
 ---
 
-## 🎭 L'ANNUAIRE ROYAL DES IA (L'État-Major)
+### 🎭 L'ANNUAIRE ROYAL DES IA (L'État-Major)
 *Recrutez vos experts d'un seul clic dans votre terminal :*
 
 | Expert | Modèle Ollama | Spécialité Scientifique | Rôle dans l'Épopée |
@@ -27,43 +38,26 @@ Face à des technologies de pointe (Triboélectricité, Électrons chauds, Contr
 | **Calculateur Athos** | `ollama pull phi3` | Dynamique des Fluides | Le Sage Technicien |
 | **Garde Porthos** | `ollama pull gemma2` | Sécurité & Résistance Matériaux | La Force Brute |
 | **M. de Tréville** | `ollama pull codestral` | Chirurgie du Code & APIs | Le Maître d'Œuvre |
-| **Colbert (V4.2)** | `ollama pull deepseek-coder-v2` | Logique Critique & Architecture | Le Détecteur de Failles |
-| **Lavoisier (V4.2)** | `ollama pull mistral-nemo` | Physique des Gaz & Plasmas | Le Génie de la Matière |
-| **Pascal (V4.2)** | `ollama pull mathstral` | Bilans Exergétiques & Rendements | Le Grand Mathématicien |
-| **Vauban (V4.2)** | `ollama pull qwen2.5` | Ingénierie & Fortifications | Le Maréchal de l'Usine |
+| **Colbert (V4.4)** | `ollama pull deepseek-coder-v2` | Logique Critique & Architecture | Le Détecteur de Failles |
+| **Lavoisier (V4.4)** | `ollama pull mistral-nemo` | Physique des Gaz & Plasmas | Le Génie de la Matière |
+| **Pascal (V4.4)** | `ollama pull mathstral` | Bilans Exergétiques & Rendements | Le Grand Mathématicien |
+| **Vauban (V4.4)** | `ollama pull qwen2.5` | Ingénierie & Fortifications | Le Maréchal de l'Usine |
 | **L'Oeil du Roi** | `ollama pull llava` | Vision par Ordinateur & Schémas | L'Observateur |
-| **Duc de Buckingham**| `Clé Gemini Cloud` | Synthèse Haute Définition | L'Allié des Nuages |
 
 ---
 
-## 🚀 LES INNOVATIONS DE LA V4.2
-*   **🛡️ Souveraineté Mobile** : Les lanceurs détectent et créent automatiquement vos dossiers `Dartagnan_Rendus` sur votre Bureau (Standard ou OneDrive).
-*   **🎖️ Baptême des Héros** : Système intelligent qui détecte les nouvelles IA et vous permet de les "adouber" avec des noms de l'épopée (Planchet, Milady, Rochefort...).
-*   **✨ Épées de Lumière 3.1** : Interface visuelle immersive. Les lames vibrent et s'illuminent selon l'état de réflexion des savants.
-*   **📐 Cockpit Flexible** : Fenêtres redimensionnables, mode plein écran (⛶) et bouton RESET pour une clarté totale.
-
----
-
-## 📖 GUIDE D'INSTALLATION "ZÉRO FRICTION"
-
-### 1. Préparation de la Monture (Une seule fois)
+### 🛠️ ÉTAPE 1 : LA PRÉPARATION (Une seule fois)
 1.  **Ollama** : [Télécharger sur ollama.com](https://ollama.com).
 2.  **Android Studio** : [Télécharger ici](https://developer.android.com/studio).
 3.  **L'Armée** : Copiez-collez les commandes `ollama pull` du tableau ci-dessus dans votre terminal.
 
-### 2. Le Rituel de Lancement (À chaque fois)
-*   **Windows** : Double-cliquez sur `Dartagnan360.bat`.
-*   **Apple (macOS)** : Faites un clic droit sur `Dartagnan360.command` > Ouvrir.
-*   *Note : Le lanceur redémarrera automatiquement Ollama pour configurer les autorisations de sécurité (CORS).*
-*   **Interface** : Une fois la page ouverte, cliquez sur **🚀 LANCER LE SYSTÈME**.
-
 ---
 
-## 🏁 COMMENT MENER LE SIÈGE ?
-1.  **Saisie** : Exposez votre problématique (Texte, Code, ou Image/Schéma).
-2.  **Consultation** : Observez le débat. Chaque expert apporte son angle unique (Architecte, Logicien, Mathématicien).
-3.  **Synthèse Royale** : Invoquez le **Cardinal de Richelieu** pour trancher et rédiger le plan d'action définitif.
-4.  **Action** : Utilisez l'icône **🚀** pour injecter le code validé directement dans votre projet.
+### 🚀 ÉTAPE 2 : LE RITUEL DE LANCEMENT (À chaque fois)
+1.  **Windows** : Double-cliquez sur `Dartagnan360.bat`. 
+2.  **Apple (macOS)** : Faites un clic droit sur `Dartagnan360.command` > Ouvrir.
+    *   *Note : Le lanceur configure automatiquement les autorisations de sécurité (CORS).*
+3.  **Interface** : Une fois la page ouverte, cliquez sur **🚀 LANCER LE SYSTÈME**.
 
 ---
 
