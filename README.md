@@ -1,69 +1,72 @@
-# ⚔️ The Musketeer Protocol : Dartagnan Vision 360° (V4.0 - Science Edition) 🔱
+# ⚔️ THE MUSKETEER PROTOCOL : DARTAGNAN VISION 360° 🔱
+## *L'Arsenal de l'Ingénierie de Rupture — Version V4.2 "Académie Royale"*
 
-[Français](#français) | [English](#english) | [Español](#español)
+[![License: MIT](https://img.shields.io/badge/License-MIT-gold.svg)](https://opensource.org/licenses/MIT)
+[![Version: 4.2](https://img.shields.io/badge/Version-4.2_Science_Edition-blue.svg)]()
+[![Status: Opérationnel](https://img.shields.io/badge/Status-Arsenal_Prêt_au_Combat-green.svg)]()
+[![Privacy: 100% Local](https://img.shields.io/badge/Confidentialité-100%25_Souveraine-brightgreen.svg)]()
 
----
-
-<a name="français"></a>
-## 🇫🇷 NOTICE UNIVERSELLE D'UTILISATION (V4.0)
-
-### 🎯 POUR QUI ?
-*   **INGÉNIEURS & SCIENTIFIQUES** : Pour valider des concepts de rupture (H2C) sans fuite de données.
-*   **ÉTUDIANTS** : Pour avoir 5 tuteurs experts qui débattent d'un cours ou d'un exercice.
-*   **CHERCHEURS D'EMPLOI** : Pour analyser des offres, simuler des entretiens techniques et optimiser leur code.
-*   **PASSIONNÉS D'IA** : Pour exploiter la puissance du local gratuitement.
+> **"Ne demandez plus l'avis d'une IA, exigez celui d'un Conseil d'Experts. Pour le Roi, pour la Science et pour H2C !"** 🇫🇷✨
 
 ---
 
-### 🛠️ ÉTAPE 1 : LA PRÉPARATION DU MATÉRIEL (Une seule fois)
+## 🌟 La Vision (Le Défi H2C)
+Le **Musketeer Protocol** n'est pas un simple outil de chat. C'est un **Conseil Scientifique de Rupture** forgé à l'origine pour répondre aux exigences physiques extrêmes du projet **H2C** (Réacteur à Cavitation Hydro-Cinétique). 
 
-1.  **Installez OLLAMA** : Allez sur [ollama.com](https://ollama.com), téléchargez et installez. C'est le moteur qui fait tourner les IA.
-2.  **Installez ANDROID STUDIO** : Allez sur [developer.android.com/studio](https://developer.android.com/studio). C'est le moteur qui permet à l'IA d'agir sur votre PC.
-3.  **Téléchargez vos experts** : Ouvrez un terminal (invite de commande) et tapez ces commandes une par une :
-    *   `ollama pull llama3` (Le leader)
-    *   `ollama pull mistral` (L'érudit)
-    *   `ollama pull codestral` (L'expert code)
-    *   `ollama pull deepseek-coder-v2` (Le logicien V4)
-    *   `ollama pull mathstral` (Le mathématicien V4)
+Face à des technologies de pointe (Triboélectricité, Électrons chauds, Contra-rotation), une IA classique échoue par "biais de normalisation". Dartagnan V4.2 brise ces chaînes en faisant débattre simultanément les meilleurs cerveaux du monde pour extraire une **Vérité Technique Inattaquable**.
 
 ---
 
-### 🚀 ÉTAPE 2 : LE RITUEL DE LANCEMENT (À chaque utilisation)
+## 🎭 L'ANNUAIRE ROYAL DES IA (L'État-Major)
+*Recrutez vos experts d'un seul clic dans votre terminal :*
 
-1.  **Ouvrez le projet** dans Android Studio.
-2.  **Lancez le Système** : 
-    *   **Windows** : Allez dans le dossier du projet et double-cliquez sur `Dartagnan360.bat`.
-    *   **Apple (Mac)** : Faites un clic droit sur `Dartagnan360.command` > Ouvrir (ou utilisez `chmod +x` dans le terminal).
-3.  **Entrez dans la Forteresse** : Votre navigateur va s'ouvrir sur la page `Vision360_Mousquetaires.html`.
-4.  **Activation** : Cliquez sur le gros bouton **🚀 LANCER LE SYSTÈME**. Attendez que le message **✨ ARSENAL OPÉRATIONNEL ✨** apparaisse.
-
----
-
-### 📖 ÉTAPE 3 : COMMENT MENER UNE CONSULTATION ?
-
-1.  **Exposez votre problème** : Dans le grand champ noir à gauche, tapez votre question ou collez votre code.
-2.  **Ajoutez des preuves** : Vous pouvez glisser une image (schéma, capture d'écran) dans la zone dédiée.
-3.  **Lancez l'assaut** : Cliquez sur **LANCER LA CONSULTATION**. 
-    *   *Regardez les épées* : Elles s'allument une par une. Quand une épée brille d'un blanc pur, l'expert a fini.
-4.  **Étudiez les rapports** : Cliquez sur l'icône **⛶** pour lire une réponse en plein écran.
-5.  **La Décision Royale** : Cliquez sur **🔱 GÉNÉRER LA SYNTHÈSE SUPRÊME**. Le Cardinal de Richelieu va lire tous les avis et vous donner le plan d'action définitif.
+| Expert | Modèle Ollama | Spécialité Scientifique | Rôle dans l'Épopée |
+| :--- | :--- | :--- | :--- |
+| **Général Dartagnan** | `ollama pull llama3.1` | Stratégie & Logique Globale | Le Chef d'Orchestre |
+| **Érudit Aramis** | `ollama pull mistral` | Contexte & État de l'art | Le Gardien du Savoir |
+| **Calculateur Athos** | `ollama pull phi3` | Dynamique des Fluides | Le Sage Technicien |
+| **Garde Porthos** | `ollama pull gemma2` | Sécurité & Résistance Matériaux | La Force Brute |
+| **M. de Tréville** | `ollama pull codestral` | Chirurgie du Code & APIs | Le Maître d'Œuvre |
+| **Colbert (V4.2)** | `ollama pull deepseek-coder-v2` | Logique Critique & Architecture | Le Détecteur de Failles |
+| **Lavoisier (V4.2)** | `ollama pull mistral-nemo` | Physique des Gaz & Plasmas | Le Génie de la Matière |
+| **Pascal (V4.2)** | `ollama pull mathstral` | Bilans Exergétiques & Rendements | Le Grand Mathématicien |
+| **Vauban (V4.2)** | `ollama pull qwen2.5` | Ingénierie & Fortifications | Le Maréchal de l'Usine |
+| **L'Oeil du Roi** | `ollama pull llava` | Vision par Ordinateur & Schémas | L'Observateur |
+| **Duc de Buckingham**| `Clé Gemini Cloud` | Synthèse Haute Définition | L'Allié des Nuages |
 
 ---
 
-### 🔐 SÉCURITÉ & CLÉ CLOUD (Optionnel)
-Pour activer le **Duc de Buckingham** (Gemini), créez une clé gratuite sur [Google AI Studio](https://aistudio.google.com/app/apikey).
-*   Cherchez le fichier `.env.example` dans le projet.
-*   Renommez-le en `.env`.
-*   Ouvrez-le et collez votre clé.
+## 🚀 LES INNOVATIONS DE LA V4.2
+*   **🛡️ Souveraineté Mobile** : Les lanceurs détectent et créent automatiquement vos dossiers `Dartagnan_Rendus` sur votre Bureau (Standard ou OneDrive).
+*   **🎖️ Baptême des Héros** : Système intelligent qui détecte les nouvelles IA et vous permet de les "adouber" avec des noms de l'épopée (Planchet, Milady, Rochefort...).
+*   **✨ Épées de Lumière 3.1** : Interface visuelle immersive. Les lames vibrent et s'illuminent selon l'état de réflexion des savants.
+*   **📐 Cockpit Flexible** : Fenêtres redimensionnables, mode plein écran (⛶) et bouton RESET pour une clarté totale.
 
 ---
 
-### 🏁 ASTUCES DE PRO
-*   **🎯 RESET** : Si vous avez trop agrandi les fenêtres, cliquez sur RESET pour tout remettre en ordre.
-*   **🧹 ARCHIVER** : Gardez une trace de vos découvertes sur votre bureau.
-*   **🚀 APPLIQUER** : Si le Cardinal propose du code, cliquez sur la fusée pour l'injecter directement dans votre projet.
+## 📖 GUIDE D'INSTALLATION "ZÉRO FRICTION"
+
+### 1. Préparation de la Monture (Une seule fois)
+1.  **Ollama** : [Télécharger sur ollama.com](https://ollama.com).
+2.  **Android Studio** : [Télécharger ici](https://developer.android.com/studio).
+3.  **L'Armée** : Copiez-collez les commandes `ollama pull` du tableau ci-dessus dans votre terminal.
+
+### 2. Le Rituel de Lancement (À chaque fois)
+*   **Windows** : Double-cliquez sur `Dartagnan360.bat`.
+*   **Apple (macOS)** : 
+    1. Dans un terminal : `chmod +x Dartagnan360.command`
+    2. Lancez `Dartagnan360.command`.
+*   **Interface** : Une fois la page ouverte, cliquez sur **🚀 LANCER LE SYSTÈME**.
 
 ---
 
-**"Un pour tous, et tous pour le Code !"** ⚔️🔱
-*Ce projet est votre arsenal. Utilisez-le avec sagesse.*
+## 🏁 COMMENT MENER LE SIÈGE ?
+1.  **Saisie** : Exposez votre problématique (Texte, Code, ou Image/Schéma).
+2.  **Consultation** : Observez le débat. Chaque expert apporte son angle unique (Architecte, Logicien, Mathématicien).
+3.  **Synthèse Royale** : Invoquez le **Cardinal de Richelieu** pour trancher et rédiger le plan d'action définitif.
+4.  **Action** : Utilisez l'icône **🚀** pour injecter le code validé directement dans votre projet.
+
+---
+
+**"Un pour tous, et tous pour le Code ! Pour le Roi et la France !"** ⚔️🔱🇫🇷
+*Projet Open-Source distribué sous Licence MIT. 100% Privé. 100% Local.*
