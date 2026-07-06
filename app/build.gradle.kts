@@ -6,11 +6,7 @@ plugins {
 
 android {
     namespace = "com.vahan.dartagnan"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.vahan.dartagnan"
@@ -24,9 +20,7 @@ android {
 
     buildTypes {
         release {
-            optimization {
-                enable = false
-            }
+            isMinifyEnabled = false
         }
     }
     compileOptions {
@@ -39,27 +33,27 @@ android {
 
     testOptions {
         unitTests.all {
-            (it as Test).testLogging {
+            it.testLogging {
                 showStandardStreams = true
                 events("passed", "failed", "skipped")
             }
-            (it as Test).systemProperty("prompt", System.getProperty("prompt") ?: "")
-            (it as Test).systemProperty("model", System.getProperty("model") ?: "")
         }
     }
 }
 
-// AJOUT DE LA TÂCHE DE LANCEMENT DU PONT ROYAL (V2.8)
+// AJOUT DE LA TÂCHE DE LANCEMENT DU PONT ROYAL (V4.2 - Ultra Robust)
+// On utilise une approche qui ne dépend pas des SourceSets standards de Java
 tasks.register<JavaExec>("runBridge") {
     group = "dartagnan"
     description = "Lance le Pont Royal pour la page Web"
+    
+    // On repasse en fun main()
     mainClass.set("com.vahan.dartagnan.DartagnanBridgeKt")
     
-    // On utilise la configuration d'exécution de l'application
+    val compileKotlin = tasks.getByPath(":app:compileDebugKotlin") as org.jetbrains.kotlin.gradle.tasks.KotlinCompile
     val runtimeConfig = configurations.getByName("debugRuntimeClasspath")
-    val compileTask = tasks.getByName("compileDebugKotlin")
-    
-    classpath = files(compileTask) + runtimeConfig
+
+    classpath = files(compileKotlin.destinationDirectory) + runtimeConfig
 }
 
 dependencies {
