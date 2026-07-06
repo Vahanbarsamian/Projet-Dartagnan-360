@@ -28,8 +28,23 @@ if %errorlevel% neq 0 (
     echo [+] Android Studio est actif.
 )
 
-:: 3. CONFIGURATION JAVA AUTOMATIQUE
-echo ☕ Configuration du moteur Java...
+:: 3. CONFIGURATION JAVA ET DOSSIERS AUTOMATIQUE
+echo ☕ Configuration de l'environnement...
+
+:: Creation des dossiers de rendu sur le Bureau (standard ou OneDrive)
+set "DESKTOP_DIR=%USERPROFILE%\Desktop"
+if exist "%USERPROFILE%\OneDrive\Bureau" set "DESKTOP_DIR=%USERPROFILE%\OneDrive\Bureau"
+if exist "%USERPROFILE%\OneDrive\Desktop" set "DESKTOP_DIR=%USERPROFILE%\OneDrive\Desktop"
+
+if not exist "!DESKTOP_DIR!\Dartagnan_Rendus" (
+    mkdir "!DESKTOP_DIR!\Dartagnan_Rendus"
+    echo [+] Dossier Dartagnan_Rendus cree sur le Bureau.
+)
+if not exist "!DESKTOP_DIR!\Dartagnan_Archives" (
+    mkdir "!DESKTOP_DIR!\Dartagnan_Archives"
+    echo [+] Dossier Dartagnan_Archives cree sur le Bureau.
+)
+
 if exist "C:\Program Files\Android\Android Studio\jbr" (
     set "JAVA_HOME=C:\Program Files\Android\Android Studio\jbr"
     set "PATH=!JAVA_HOME!\bin;!PATH!"

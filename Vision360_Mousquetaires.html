@@ -58,10 +58,13 @@
         .mousquetaires-list { display: flex; gap: 8px; flex-wrap: wrap; }
         .mousquetaire-item {
             font-size: 0.7em;
-            padding: 2px 8px;
+            padding: 4px 8px;
             border: 1px solid #333;
             border-radius: 10px;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
         .mousquetaire-item.active { border-color: var(--gold); color: var(--gold); background: rgba(255, 215, 0, 0.05); }
 
@@ -73,9 +76,9 @@
         }
 
         /* Colonnes */
-        .input-area { width: 320px; display: flex; flex-direction: column; gap: 8px; }
+        .input-area { width: 340px; display: flex; flex-direction: column; gap: 8px; }
         .responses-grid { flex: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 10px; overflow-y: auto; padding-right: 5px; }
-        .right-panel { width: 220px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
+        .right-panel { width: 240px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
 
         /* Composants Saisie */
         textarea { background: #000; color: #fff; border: 1px solid var(--border); padding: 10px; border-radius: 4px; font-family: monospace; font-size: 0.85em; resize: both; }
@@ -86,7 +89,7 @@
         #dropZone.dragover { border-color: var(--gold); color: var(--gold); }
         #imagePreview { max-width: 100%; max-height: 80px; display: none; margin: 5px auto; }
 
-        .btn-small { padding: 5px; font-size: 0.75em; flex: 1; background: #222; color: #ccc; border: 1px solid #333; }
+        .btn-small { padding: 5px; font-size: 0.75em; flex: 1; background: #222; color: #ccc; border: 1px solid #333; cursor: pointer; }
         .btn-gold { background: var(--gold); color: #000; font-weight: bold; border: none; }
 
         /* Cartes de réponses */
@@ -192,14 +195,14 @@
 
             <div style="border: 1px solid var(--border); padding: 8px; background: #000;">
                 <h4 style="margin:0 0 5px 0; font-size: 0.75em; color: #0f0;">📟 CONSOLE</h4>
-                <div id="shellOutput" style="font-size: 0.65em; color: #666; height: 80px; overflow-y: auto; margin-bottom: 5px;"></div>
+                <div id="shellOutput" style="font-size: 0.65em; color: #666; height: 100px; overflow-y: auto; margin-bottom: 5px;"></div>
                 <input type="text" id="shellInput" value="ollama serve" style="width: 90%; background: transparent; color: #0f0; border: none; font-size: 0.7em; font-family: monospace;">
                 <button class="btn-small" style="width:100%; border-color: #0f0; color: #0f0;" onclick="executeShell()">EXÉCUTER</button>
             </div>
 
             <div style="border: 1px solid var(--border); padding: 8px;">
                 <h4 style="margin:0 0 5px 0; font-size: 0.75em; color: #0bf;">☁️ LE DUC (GEMINI)</h4>
-                <textarea id="geminiInput" placeholder="Expertise Cloud..." style="width: 90%; height: 60px; font-size: 0.7em;"></textarea>
+                <textarea id="geminiInput" placeholder="Expertise Cloud..." style="width: 100%; height: 60px; font-size: 0.7em;"></textarea>
             </div>
         </div>
     </div>
@@ -216,16 +219,20 @@
     <script>
         const OLLAMA_URL = 'http://localhost:11434/api/chat';
         const roles = {
-            'llama3:latest': 'INGÉNIEUR SYSTÈME (Architecture H2C)',
-            'mistral:latest': 'THÉORICIEN (Physique des Plasmas)',
-            'phi3:latest': 'CALCULATEUR (Dynamique des Fluides)',
-            'gemma2:latest': 'EXPERT MATÉRIAUX (C/SiC & Nanoparticules)',
-            'codestral:latest': 'CHIRURGIEN DU CODE (Optimisation Algo)',
-            'deepseek-coder-v2:latest': 'LOGICIEN CRITIQUE (Détection de Failles)',
-            'mathstral:latest': 'MATHÉMATICIEN (Bilans Exergétiques)',
-            'qwen2.5:latest': 'MARÉCHAL VAUBAN (Ingénierie & Fortification)'
+            'llama3.1:latest': 'GÉNÉRAL DARTAGNAN (Stratégie & Logique)',
+            'llama3:latest': 'GÉNÉRAL DARTAGNAN (Stratégie & Logique)',
+            'mistral:latest': 'ÉRUDIT ARAMIS (Clarté & Contexte)',
+            'phi3:latest': 'CALCULATEUR ATHOS (Dynamique des Fluides)',
+            'gemma2:latest': 'GARDE DU CORPS PORTHOS (Sécurité & Matériaux)',
+            'codestral:latest': 'M. DE TRÉVILLE (Expertise Code Pur)',
+            'deepseek-coder-v2:latest': 'COLBERT (Logicien Critique)',
+            'mathstral:latest': 'PASCAL (Bilans Exergétiques)',
+            'qwen2.5:latest': 'VAUBAN (Ingénierie & Fortification)',
+            'mistral-nemo:latest': 'LAVOISIER (Physique des Gaz & Plasmas)',
+            'llava:latest': 'L\'OEIL DU ROI (Vision & Schémas)'
         };
         const mapping = {
+            'llama3.1:latest': 'Dartagnan',
             'llama3:latest': 'Dartagnan',
             'mistral:latest': 'Aramis',
             'phi3:latest': 'Athos',
@@ -233,8 +240,12 @@
             'codestral:latest': 'Tréville',
             'deepseek-coder-v2:latest': 'Colbert',
             'mathstral:latest': 'Pascal',
-            'qwen2.5:latest': 'Vauban'
+            'qwen2.5:latest': 'Vauban',
+            'mistral-nemo:latest': 'Lavoisier',
+            'llava:latest': 'L\'Oeil'
         };
+
+        const epicNames = ["Planchet", "Grimaud", "Mousqueton", "Bazin", "Milady", "Rochefort", "Constance", "Lord Winter", "Felton", "Jussac", "Cahusac", "Bernajoux", "Mme de Chevreuse"];
 
         let availableModels = [];
 
@@ -252,7 +263,7 @@
                 if(r.ok) log("Pont Royal", "✅ ACTIF", "#0f0");
             } catch(e) {
                 log("Pont Royal", "❌ ABSENT", "#f44");
-                alert("Lancez le Pont Royal dans Android Studio !");
+                alert("Lancez le Pont Royal via le .bat ou Android Studio !");
                 btn.innerText = "❌ ÉCHEC"; btn.disabled = false; return;
             }
 
@@ -276,30 +287,55 @@
         }
 
         function resetInterface() {
-        document.getElementById('promptInput').style.width = '100%';
-        document.getElementById('promptInput').style.height = '120px';
-        document.getElementById('geminiInput').style.width = '100%';
-        document.getElementById('geminiInput').style.height = '60px';
-    }
+            document.getElementById('promptInput').style.width = '100%';
+            document.getElementById('promptInput').style.height = '120px';
+            document.getElementById('geminiInput').style.width = '100%';
+            document.getElementById('geminiInput').style.height = '60px';
+        }
 
-    async function fetchModels() {
+        async function fetchModels() {
             try {
                 const r = await fetch('http://localhost:11434/api/tags');
                 const data = await r.json();
                 availableModels = data.models;
-                const container = document.getElementById('modelList');
-                container.innerHTML = '';
-                availableModels.forEach(m => {
-                    const nick = mapping[m.name] || m.name;
-                    const role = roles[m.name] || "Expert";
-                    const skill = role.includes('(') ? role.match(/\(([^)]+)\)/)[0] : "";
-
-                    const div = document.createElement('div');
-                    div.className = 'mousquetaire-item active';
-                    div.innerHTML = `<input type="checkbox" checked data-model="${m.name}"> <b>${nick}</b> <span style="font-size:0.8em; opacity:0.6;">${skill}</span>`;
-                    container.appendChild(div);
-                });
+                renderModelList();
             } catch (e) {}
+        }
+
+        function renderModelList() {
+            const container = document.getElementById('modelList');
+            container.innerHTML = '';
+            availableModels.forEach(m => {
+                const isKnown = mapping[m.name];
+                const nick = mapping[m.name] || `Soldat ${m.name.split(':')[0]}`;
+                const role = roles[m.name] || "Expert Indépendant";
+                const skill = role.includes('(') ? role.match(/\(([^)]+)\)/)[0] : role;
+
+                const div = document.createElement('div');
+                div.className = 'mousquetaire-item active';
+
+                let baptemeHtml = "";
+                if (!isKnown) {
+                    baptemeHtml = `<select onchange="baptiser('${m.name}', this.value)" style="background:#000; color:var(--gold); border:none; font-size:0.8em; cursor:pointer; margin-left:5px;">
+                        <option value="">🎖️ BAPTISER</option>
+                        ${epicNames.map(name => `<option value="${name}">${name}</option>`).join('')}
+                    </select>`;
+                }
+
+                div.innerHTML = `
+                    <input type="checkbox" checked data-model="${m.name}">
+                    <b>${nick}</b> ${baptemeHtml} <span style="font-size:0.8em; opacity:0.6;">${skill}</span>
+                    <button class="act-btn" onclick="executeShell('pull ${m.name}')" title="Mettre à jour" style="border:none; margin-left:5px;">🔄</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function baptiser(modelName, newNick) {
+            if (!newNick) return;
+            mapping[modelName] = newNick;
+            alert(`🛡️ Le modèle ${modelName} a été adoubé sous le nom de : ${newNick} !`);
+            renderModelList();
         }
 
         async function askAll() {
@@ -352,8 +388,10 @@
             const sword = document.getElementById(swordId);
             sword.classList.add('state-received');
 
+            const myRole = roles[model] || 'EXPERT SCIENTIFIQUE';
             const systemMsg = `Tu es ${nickname}, expert ${myRole}.
             TON ÉTHIQUE : 1. Si un projet de rupture (ex: H2C) est présenté, sois fidèle à sa physique. 2. Pour toute question générale, apporte l'état de l'art. 3. Ne dénigre jamais les méthodes classiques (ex: électrolyse), explique avec noblesse pourquoi elles sont adaptées ou non. Réponds en Français.`;
+
             const payload = {
                 model: model,
                 messages: [
@@ -378,6 +416,7 @@
                 return content;
             } catch (e) {
                 document.getElementById(cardId).innerText = "Erreur.";
+                sword.style.opacity = "0.3";
                 return "";
             }
         }
@@ -393,8 +432,11 @@
         async function executeShell(customCmd = null) {
             const cmd = customCmd || document.getElementById('shellInput').value;
             const out = document.getElementById('shellOutput');
-            const log = (m) => { const d = document.createElement('div'); d.innerText = `> ${m}`; out.prepend(d); };
+            const log = (m, color="#888") => {
+                const d = document.createElement('div'); d.style.color = color; d.innerText = `> ${m}`; out.prepend(d);
+            };
 
+            log(`Exécution : ${cmd}`, "#0f0");
             try {
                 const r = await fetch('http://localhost:8081/forge', {
                     method: 'POST',
@@ -402,10 +444,9 @@
                     body: `command=${encodeURIComponent(cmd)}`
                 });
                 log(await r.text());
-            } catch (e) { log("Erreur réseau"); }
+            } catch (e) { log("Erreur réseau", "#f44"); }
         }
 
-        // --- Fonctions utilitaires ---
         async function fetchArchives() {
             const container = document.getElementById('archiveList');
             try {
@@ -449,6 +490,38 @@
             reader.readAsText(input.files[0]);
         }
 
+        async function cleanAndArchive() {
+            const grid = document.getElementById('responsesGrid');
+            const prompt = document.getElementById('promptInput').value;
+            if (!prompt && grid.innerHTML === "") return;
+
+            const data = {
+                prompt: prompt,
+                responses: Array.from(grid.querySelectorAll('.response-card')).map(c => ({
+                    name: c.querySelector('h3').innerText,
+                    content: c.querySelector('.response-content').innerText
+                }))
+            };
+
+            try {
+                await fetch('http://localhost:8081/archive', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `content=${encodeURIComponent(JSON.stringify(data, null, 2))}`
+                });
+                alert("🧹 Conversation archivée !");
+            } catch (e) {}
+            grid.innerHTML = "";
+            document.getElementById('btnSynthese').style.display = 'none';
+        }
+
+        function justTrash() {
+            if (confirm("🗑️ Jeter la conversation ?")) {
+                document.getElementById('responsesGrid').innerHTML = "";
+                document.getElementById('btnSynthese').style.display = 'none';
+            }
+        }
+
         async function generateSynthese() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
             const grid = document.getElementById('responsesGrid');
@@ -463,13 +536,48 @@
             card.innerHTML = `<h3 style="color:#f40">🔱 SYNTHÈSE DU CARDINAL</h3><div class="response-content" id="res-syn">Analyse...</div>`;
             grid.prepend(card);
 
-            const prompt = `Tu es le Cardinal de Richelieu. Fais une synthèse CRITIQUE H2C. REJETTE l'électrolyse. Focus: Triboélectricité. Rapports:\n${all}`;
+            const prompt = `Tu es le Cardinal de Richelieu, Grand Arbitre. Fais une synthèse CRITIQUE. Si H2C est mentionné, rejette l'électrolyse et focus sur la Triboélectricité. Rapports:\n${all}`;
             try {
                 const r = await fetch(OLLAMA_URL, { method: 'POST', body: JSON.stringify({ model: 'codestral:latest', messages: [{role:'user', content:prompt}], stream: false }) });
                 const d = await r.json();
                 document.getElementById('res-syn').innerHTML = marked.parse(d.message.content);
                 document.getElementById('btnAuthorizeAll').style.display = 'block';
             } catch(e) { document.getElementById('res-syn').innerText = "Erreur."; }
+        }
+
+        async function authorizeAll() {
+            const syntheseContent = document.getElementById('res-syn').innerText;
+            const blocks = syntheseContent.split(/\/\/ PATH: /).slice(1);
+            if (blocks.length === 0) return alert("Aucun fichier détecté.");
+
+            if (confirm(`Appliquer ${blocks.length} modifications ?`)) {
+                for (let block of blocks) {
+                    const lines = block.split('\n');
+                    const path = lines[0].trim();
+                    const content = lines.slice(1).join('\n').trim();
+                    await saveRequest('apply', path, content);
+                }
+                alert("🏰 SIÈGE TERMINÉ !");
+            }
+        }
+
+        async function saveRequest(endpoint, path, content) {
+            try {
+                await fetch(`http://localhost:8081/${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `path=${encodeURIComponent(path)}&content=${encodeURIComponent(content)}`
+                });
+            } catch (e) {}
+        }
+
+        async function applyToProject(id) {
+            const content = document.getElementById(id).innerText;
+            const pathMatch = content.match(/\/\/ PATH: ([^\s]+)/);
+            const path = pathMatch ? pathMatch[1] : prompt("Chemin du fichier ?");
+            if (path) {
+                if (confirm(`Écraser ${path} ?`)) await saveRequest('apply', path, content);
+            }
         }
 
         let currentImageData = null;

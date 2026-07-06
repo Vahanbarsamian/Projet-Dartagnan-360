@@ -13,9 +13,23 @@ import io.ktor.server.plugins.contentnegotiation.*
 import java.io.File
 
 fun main() {
-    val projectRoot = "C:/Users/vahan/AndroidStudioProjects/Dartagnan"
-    val desktopDir = "C:/Users/vahan/OneDrive/Bureau/Dartagnan_Rendus"
-    val archivesDir = File("C:/Users/vahan/OneDrive/Bureau/Dartagnan_Archives")
+    val userHome = System.getProperty("user.home") ?: ""
+    val projectRoot = System.getProperty("user.dir") ?: ""
+    
+    // Detection dynamique du bureau (Standard ou OneDrive)
+    var desktopPath = File(userHome, "Desktop")
+    if (File(userHome, "OneDrive/Bureau").exists()) desktopPath = File(userHome, "OneDrive/Bureau")
+    else if (File(userHome, "OneDrive/Desktop").exists()) desktopPath = File(userHome, "OneDrive/Desktop")
+    
+    val desktopDir = File(desktopPath, "Dartagnan_Rendus").absolutePath
+    val archivesDir = File(desktopPath, "Dartagnan_Archives")
+    
+    if (!archivesDir.exists()) archivesDir.mkdirs()
+    if (!File(desktopDir).exists()) File(desktopDir).mkdirs()
+
+    println("🔱 LE PONT ROYAL EST ACTIF")
+    println("📂 Dossier Rendus : $desktopDir")
+    println("📚 Dossier Archives : ${archivesDir.absolutePath}")
 
     embeddedServer(Netty, port = 8081) {
         install(CORS) {
