@@ -1,81 +1,69 @@
-# ⚔️ The Musketeer Protocol : Dartagnan Vision 360° (V3.0) 🔱
+# ⚔️ The Musketeer Protocol : Dartagnan Vision 360° (V4.0 - Science Edition) 🔱
 
 [Français](#français) | [English](#english) | [Español](#español)
 
 ---
 
 <a name="français"></a>
-## 🇫🇷 VERSION FRANÇAISE
+## 🇫🇷 NOTICE UNIVERSELLE D'UTILISATION (V4.0)
 
-### 🎯 POUR QUI EST CONÇU CET OUTIL ?
-Dartagnan est une station de combat d'ingénierie conçue pour les **développeurs seniors, les architectes logiciels et les chercheurs** travaillant sur des projets complexes et sensibles (comme le projet **H2C**). 
-Il est indispensable pour ceux qui :
-*   Exigent une **confidentialité totale** (Zéro Cloud, Zéro fuite).
-*   Ont besoin d'une **analyse multi-angle** (Vision 360°) pour éliminer les erreurs de logique.
-*   Souhaitent automatiser la modification de leur code et la génération de livrables.
-
-### 🛠️ PRÉ-REQUIS
-1.  **Ollama** : [Télécharger ici](https://ollama.com).
-2.  **Android Studio** : [Télécharger ici](https://developer.android.com/studio). (Nécessaire pour le moteur Java et Ktor).
-3.  **Matériel** : GPU NVIDIA (8 Go VRAM+) et 16 Go RAM recommandés pour faire débattre les IA fluidement.
-
-### 🚀 INSTALLATION & CONFIGURATION
-1.  **Téléchargement des experts** : Dans un terminal, lancez :
-    `ollama pull llama3 mistral codestral phi3 gemma2 llava`
-2.  **Clé API (Optionnelle)** : Renommez `.env.example` en `.env` et insérez votre clé Gemini pour le Duc de Buckingham.
-
-### 🏁 LANCEMENT "UN CLIC"
-*   **Sur Windows** : Copiez Dartagan360.bat et placesz le sur votre bureau.Double-cliquez sur `Dartagnan360.bat`. Le script configure Java, réveille Ollama et lance l'interface automatiquement.
-*   **Sur Apple (macOS)** : 
-    1.  Ouvrez un terminal et tapez `chmod +x Dartagnan360.command`.
-    2.  Double-cliquez sur `Dartagnan360.command`.
+### 🎯 POUR QUI ?
+*   **INGÉNIEURS & SCIENTIFIQUES** : Pour valider des concepts de rupture (H2C) sans fuite de données.
+*   **ÉTUDIANTS** : Pour avoir 5 tuteurs experts qui débattent d'un cours ou d'un exercice.
+*   **CHERCHEURS D'EMPLOI** : Pour analyser des offres, simuler des entretiens techniques et optimiser leur code.
+*   **PASSIONNÉS D'IA** : Pour exploiter la puissance du local gratuitement.
 
 ---
 
-<a name="english"></a>
-## 🇺🇸 ENGLISH VERSION
+### 🛠️ ÉTAPE 1 : LA PRÉPARATION DU MATÉRIEL (Une seule fois)
 
-### 🎯 TARGET AUDIENCE
-Dartagnan is an engineering war station built for **senior developers, software architects, and researchers** handling complex and sensitive projects (such as the **H2C project**).
-Perfect for those who:
-*   Require **absolute privacy** (Local-first, no data leaks).
-*   Need **360° multi-angle analysis** to eliminate logic flaws.
-*   Want to automate code modification and document generation.
-
-### 🛠️ PREREQUISITES
-1.  **Ollama**: [Download here](https://ollama.com).
-2.  **Android Studio**: [Download here](https://developer.android.com/studio). (Used as the core runtime engine).
-3.  **Hardware**: NVIDIA GPU (8GB VRAM+) and 16GB RAM recommended.
-
-### 🚀 SETUP
-1.  **Pull the models**: Run in your terminal:
-    `ollama pull llama3 mistral codestral phi3 gemma2 llava`
-2.  **API Key**: Rename `.env.example` to `.env` and paste your Gemini key for the "Duke of Buckingham".
-
-### 🏁 ONE-CLICK LAUNCH
-*   **Windows**: Copy dartagnen360.bat and place it on your Desktop. Double-click `Dartagnan360.bat`. The script auto-configs Java, wakes up Ollama, and opens the UI.
-*   **Apple (macOS)**: 
-    1.  Run `chmod +x Dartagnan360.command` in terminal.
-    2.  Double-click `Dartagnan360.command`.
+1.  **Installez OLLAMA** : Allez sur [ollama.com](https://ollama.com), téléchargez et installez. C'est le moteur qui fait tourner les IA.
+2.  **Installez ANDROID STUDIO** : Allez sur [developer.android.com/studio](https://developer.android.com/studio). C'est le moteur qui permet à l'IA d'agir sur votre PC.
+3.  **Téléchargez vos experts** : Ouvrez un terminal (invite de commande) et tapez ces commandes une par une :
+    *   `ollama pull llama3` (Le leader)
+    *   `ollama pull mistral` (L'érudit)
+    *   `ollama pull codestral` (L'expert code)
+    *   `ollama pull deepseek-coder-v2` (Le logicien V4)
+    *   `ollama pull mathstral` (Le mathématicien V4)
 
 ---
 
-<a name="español"></a>
-## 🇪🇸 VERSIÓN ESPAÑOLA
+### 🚀 ÉTAPE 2 : LE RITUEL DE LANCEMENT (À chaque utilisation)
 
-### 🎯 ¿PARA QUIÉN ES ESTA HERRAMIENTA?
-Dartagnan es una estación de combate de ingeniería diseñada para **desarrolladores senior, arquitectos de software e investigadores** que trabajan en proyectos complejos (como el proyecto **H2C**).
-
-### 🛠️ REQUISITOS PREVIOS
-1.  **Ollama**: [Descargar aquí](https://ollama.com).
-2.  **Android Studio**: [Descargar aquí](https://developer.android.com/studio).
-3.  **Hardware**: GPU NVIDIA (8GB VRAM+) y 16GB RAM recomendados.
-
-### 🏁 LANZAMIENTO "UN CLIC"
-*   **Windows**: Copia Dartagnan360.bat y colócalo en el escritorio. Doble clic en `Dartagnan360.bat`.
-*   **Apple (macOS)**: Ejecute `chmod +x Dartagnan360.command` y luego doble clic.
+1.  **Ouvrez le projet** dans Android Studio.
+2.  **Lancez le Système** : 
+    *   **Windows** : Allez dans le dossier du projet et double-cliquez sur `Dartagnan360.bat`.
+    *   **Apple (Mac)** : Faites un clic droit sur `Dartagnan360.command` > Ouvrir (ou utilisez `chmod +x` dans le terminal).
+3.  **Entrez dans la Forteresse** : Votre navigateur va s'ouvrir sur la page `Vision360_Mousquetaires.html`.
+4.  **Activation** : Cliquez sur le gros bouton **🚀 LANCER LE SYSTÈME**. Attendez que le message **✨ ARSENAL OPÉRATIONNEL ✨** apparaisse.
 
 ---
 
-**"Un pour tous, et tous pour H2C !"** ⚔️🔱
-*MIT License - 100% Private - 100% Free*
+### 📖 ÉTAPE 3 : COMMENT MENER UNE CONSULTATION ?
+
+1.  **Exposez votre problème** : Dans le grand champ noir à gauche, tapez votre question ou collez votre code.
+2.  **Ajoutez des preuves** : Vous pouvez glisser une image (schéma, capture d'écran) dans la zone dédiée.
+3.  **Lancez l'assaut** : Cliquez sur **LANCER LA CONSULTATION**. 
+    *   *Regardez les épées* : Elles s'allument une par une. Quand une épée brille d'un blanc pur, l'expert a fini.
+4.  **Étudiez les rapports** : Cliquez sur l'icône **⛶** pour lire une réponse en plein écran.
+5.  **La Décision Royale** : Cliquez sur **🔱 GÉNÉRER LA SYNTHÈSE SUPRÊME**. Le Cardinal de Richelieu va lire tous les avis et vous donner le plan d'action définitif.
+
+---
+
+### 🔐 SÉCURITÉ & CLÉ CLOUD (Optionnel)
+Pour activer le **Duc de Buckingham** (Gemini), créez une clé gratuite sur [Google AI Studio](https://aistudio.google.com/app/apikey).
+*   Cherchez le fichier `.env.example` dans le projet.
+*   Renommez-le en `.env`.
+*   Ouvrez-le et collez votre clé.
+
+---
+
+### 🏁 ASTUCES DE PRO
+*   **🎯 RESET** : Si vous avez trop agrandi les fenêtres, cliquez sur RESET pour tout remettre en ordre.
+*   **🧹 ARCHIVER** : Gardez une trace de vos découvertes sur votre bureau.
+*   **🚀 APPLIQUER** : Si le Cardinal propose du code, cliquez sur la fusée pour l'injecter directement dans votre projet.
+
+---
+
+**"Un pour tous, et tous pour le Code !"** ⚔️🔱
+*Ce projet est votre arsenal. Utilisez-le avec sagesse.*

@@ -3,1026 +3,477 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dartagnan Vision 360° - Conseil des Mousquetaires</title>
+    <title>Conseil Scientifique des Mousquetaires - Pour le Roi et la France</title>
     <style>
         :root {
             --blue-royal: #002366;
             --gold: #FFD700;
-            --bg: #0a0a0a;
-            --card-bg: #1a1a1a;
-            --text: #e0e0e0;
-        }
-
-        .mermaid {
-            background: white;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
+            --bg: #050505;
+            --card-bg: #111;
+            --text: #ccc;
+            --border: #222;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', system-ui, sans-serif;
             background-color: var(--bg);
             color: var(--text);
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             height: 100vh;
+            overflow: hidden;
         }
 
-        header {
-            text-align: center;
-            border-bottom: 2px solid var(--gold);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
+        h1 { color: var(--gold); margin: 0; font-size: 1.2em; font-variant: small-caps; text-align: center; padding-bottom: 5px; border-bottom: 1px solid var(--gold); }
 
-        h1 { color: var(--gold); margin: 0; font-variant: small-caps; }
-
+        /* Barre de Lancement Compacte */
         .config-bar {
             background: var(--card-bg);
-            padding: 15px;
-            border-radius: 8px;
-            display: flex;
-            gap: 20px;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
-
-        .mousquetaires-list {
+            padding: 8px 15px;
+            border-radius: 4px;
             display: flex;
             gap: 15px;
+            align-items: center;
+            margin: 10px 0;
+            border: 1px solid var(--border);
         }
 
-        .mousquetaire-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
+        #btnLaunch {
+            background: var(--gold);
+            color: black;
+            padding: 6px 15px;
+            font-weight: bold;
+            border-radius: 3px;
+            font-size: 0.85em;
             cursor: pointer;
-            padding: 5px 10px;
-            border: 1px solid #444;
-            border-radius: 20px;
+            border: none;
             transition: 0.3s;
         }
+        #btnLaunch:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        .mousquetaire-item.active {
-            border-color: var(--gold);
-            background: rgba(255, 215, 0, 0.1);
+        #systemTicker { flex: 1; font-family: monospace; font-size: 0.75em; color: #666; }
+
+        .mousquetaires-list { display: flex; gap: 8px; flex-wrap: wrap; }
+        .mousquetaire-item {
+            font-size: 0.7em;
+            padding: 2px 8px;
+            border: 1px solid #333;
+            border-radius: 10px;
+            cursor: pointer;
         }
+        .mousquetaire-item.active { border-color: var(--gold); color: var(--gold); background: rgba(255, 215, 0, 0.05); }
 
         .main-container {
             display: flex;
-            gap: 20px;
+            gap: 15px;
             flex: 1;
             overflow: hidden;
         }
 
-        .archive-panel {
-            width: 200px;
-            background: var(--card-bg);
-            border-left: 2px solid var(--gold);
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            overflow-y: auto;
-        }
+        /* Colonnes */
+        .input-area { width: 320px; display: flex; flex-direction: column; gap: 8px; }
+        .responses-grid { flex: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 10px; overflow-y: auto; padding-right: 5px; }
+        .right-panel { width: 220px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
 
-        .archive-item {
-            padding: 8px;
-            background: #222;
-            border-radius: 4px;
-            font-size: 0.8em;
-            cursor: pointer;
-            border: 1px solid #333;
-        }
-        .archive-item:hover { border-color: var(--gold); }
+        /* Composants Saisie */
+        textarea { background: #000; color: #fff; border: 1px solid var(--border); padding: 10px; border-radius: 4px; font-family: monospace; font-size: 0.85em; resize: both; }
+        #promptInput { height: 120px; min-width: 100%; }
+        #geminiInput { height: 60px; min-width: 100%; }
 
-        .input-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            max-width: 400px;
-        }
+        #dropZone { border: 1px dashed #333; padding: 10px; text-align: center; font-size: 0.7em; color: #555; border-radius: 4px; }
+        #dropZone.dragover { border-color: var(--gold); color: var(--gold); }
+        #imagePreview { max-width: 100%; max-height: 80px; display: none; margin: 5px auto; }
 
-        /* Zone de Dépôt d'Images */
-        #dropZone {
-            border: 2px dashed #444;
-            padding: 20px;
-            text-align: center;
-            background: #111;
-            color: #888;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        #dropZone.dragover { border-color: var(--gold); background: rgba(255, 215, 0, 0.05); color: var(--gold); }
-        #imagePreview { max-width: 100%; max-height: 150.px; margin-top: 10px; display: none; border-radius: 4px; }
+        .btn-small { padding: 5px; font-size: 0.75em; flex: 1; background: #222; color: #ccc; border: 1px solid #333; }
+        .btn-gold { background: var(--gold); color: #000; font-weight: bold; border: none; }
 
-        textarea {
-            flex: 1;
-            background: #222;
-            color: white;
-            border: 1px solid #444;
-            padding: 15px;
-            border-radius: 8px;
-            font-family: 'Consolas', monospace;
-            resize: none;
-        }
+        /* Cartes de réponses */
+        .response-card { background: #0c0c0c; border: 1px solid var(--border); border-radius: 4px; padding: 10px; position: relative; }
+        .response-card h3 { margin: 0 0 8px 0; font-size: 0.75em; color: var(--gold); display: flex; align-items: center; border-bottom: 1px solid #222; padding-bottom: 4px; }
+        .response-content { font-size: 0.85em; line-height: 1.4; }
 
-        .btn-group { display: flex; gap: 10px; }
-
-        button {
-            padding: 12px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.2s;
-        }
-
-        .btn-send { background: var(--gold); color: black; flex: 2; }
-        .btn-send:hover { background: #e6c200; }
-        .btn-file { background: #444; color: white; flex: 1; }
-
-        .responses-grid {
-            flex: 2;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 15px;
-            overflow-y: auto;
-            padding-right: 10px;
-        }
-
-        .response-card {
-            background: var(--card-bg);
-            border-radius: 8px;
-            padding: 15px;
-            border-top: 4px solid var(--blue-royal);
-            position: relative;
-        }
-
-        .response-card h3 {
-            margin-top: 0;
-            color: var(--gold);
-            font-size: 0.9em;
-            text-transform: uppercase;
-            display: flex;
-            align-items: center;
-        }
-
-        .copy-btn {
-            margin-left: auto;
-            background: transparent;
-            border: 1px solid #444;
-            color: #888;
-            font-size: 0.7em;
-            padding: 2px 5px;
-        }
-        .copy-btn:hover { border-color: var(--gold); color: var(--gold); }
-
-        .response-content {
-            font-size: 0.95em;
-            line-height: 1.5;
-            white-space: pre-wrap;
-        }
-
-        .loader {
-            display: none;
-            color: var(--gold);
-            text-align: center;
-            font-style: italic;
-            margin: 10px 0;
-        }
-
-        /* Animation Épée de Lumière de Buckingham */
-        .sword-container {
-            display: inline-block;
-            width: 30px;
-            height: 40px;
-            vertical-align: middle;
-            margin-right: 10px;
-        }
-
+        /* Animation Épée Compacte */
+        .sword-container { width: 20px; height: 30px; margin-right: 8px; }
         .sword-svg { width: 100%; height: 100%; overflow: visible; }
+        .blade { fill: #222; transition: 0.5s; }
+        .guard { fill: #444; transition: 0.5s; }
+        .pommel { fill: #111; transition: 0.5s; }
 
-        .blade { fill: #333; transition: 0.5s; }
-        .guard { fill: #8B4513; transition: 0.5s; }
-        .pommel { fill: var(--gold); transition: 0.5s; }
+        .state-received .guard { fill: #00bfff; filter: drop-shadow(0 0 3px #00bfff); }
+        .state-thinking .blade { fill: url(#buckinghamGradient); animation: lightFlow 1s linear infinite; filter: drop-shadow(0 0 5px var(--gold)); }
+        .state-done .blade { fill: #FFF; filter: drop-shadow(0 0 10px var(--gold)); }
+        @keyframes lightFlow { 0%, 100% { fill-opacity: 0.3; } 50% { fill-opacity: 1; } }
 
-        /* ÉTAT 1 : REÇU (La garde s'éveille) */
-        .state-received .guard { fill: #00bfff; filter: drop-shadow(0 0 5px #00bfff); }
+        /* Tooltips et Boutons Action */
+        .action-btns { margin-left: auto; display: flex; gap: 4px; }
+        .act-btn { background: none; border: 1px solid #333; color: #666; font-size: 0.7em; padding: 2px 4px; cursor: pointer; }
+        .act-btn:hover { color: var(--gold); border-color: var(--gold); }
 
-        /* ÉTAT 2 : RÉFLEXION (Lumière fluide le long de la lame) */
-        .state-thinking .blade {
-            fill: url(#buckinghamGradient);
-            filter: drop-shadow(0 0 5px var(--gold));
-            animation: lightFlow 1s linear infinite;
-        }
+        /* Modal Plein Écran */
+        .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); overflow-y: auto; }
+        .modal-content { max-width: 900px; margin: 40px auto; background: #111; padding: 30px; border: 1px solid var(--gold); border-radius: 8px; position: relative; }
+        .close-modal { position: absolute; right: 20px; top: 10px; font-size: 2em; color: var(--gold); cursor: pointer; }
 
-        /* ÉTAT 3 : TERMINÉ (Éclat fixe et étincelant) */
-        .state-done .blade {
-            fill: #FFF;
-            filter: drop-shadow(0 0 8px #FFF) drop-shadow(0 0 15px var(--gold));
-        }
-        .state-done .sword-svg {
-            animation: sparkle 2s ease-in-out infinite;
-        }
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
 
-        @keyframes lightFlow {
-            0% { fill-opacity: 0.3; transform: translateY(2px); }
-            50% { fill-opacity: 1; transform: translateY(-2px); }
-            100% { fill-opacity: 0.3; transform: translateY(2px); }
-        }
-
-        @keyframes sparkle {
-            0%, 100% { opacity: 1; filter: brightness(1); }
-            50% { opacity: 0.8; filter: brightness(1.5); }
-        }
-
-        /* Fenetre Plein Ecran (Modal) */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0; top: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.9);
-            overflow-y: auto;
-            padding: 40px;
-        }
-
-        .modal-content {
-            background: var(--card-bg);
-            margin: auto;
-            padding: 30px;
-            border: 2px solid var(--gold);
-            width: 80%;
-            max-width: 1000px;
-            border-radius: 10px;
-            line-height: 1.6;
-            color: white;
-            font-size: 1.1em;
-        }
-
-        .close-modal {
-            position: fixed;
-            right: 30px; top: 20px;
-            color: var(--gold);
-            font-size: 40px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .status-pending { color: #555; }
-        .status-done { color: #00ff00; }
-
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        .mermaid { background: white !important; color: black; border-radius: 4px; margin-top: 10px; }
     </style>
-    <!-- Moteurs de Rendu : Texte (Marked) et Images (Mermaid) -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-    <div id="fullScreenModal" class="modal">
-    <span class="close-modal" onclick="closeFullScreen()">&times;</span>
-    <div id="modalTitle" style="color: var(--gold); font-size: 1.5em; margin-bottom: 20px; text-align: center; font-variant: small-caps;"></div>
-    <div id="modalBody" class="modal-content"></div>
-</div>
-
-<script>
-        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
-    </script>
 </head>
 <body>
 
-<header>
-    <h1>⚔️ Vision 360° : Le Conseil des Mousquetaires ⚔️</h1>
-</header>
+    <h1>⚔️ Conseil Scientifique des Mousquetaires : Pour le Roi et la France ⚔️</h1>
 
-    <div class="config-bar" id="statusBar" style="flex-direction: column; align-items: center; padding: 20px; background: #111; border-bottom: 2px solid var(--gold);">
-        <button id="btnLaunch" onclick="startAllSystems()" style="background: var(--gold); color: black; padding: 15px 40px; font-weight: bold; border-radius: 5px; font-size: 1.2em; cursor: pointer; border: none; box-shadow: 0 0 15px rgba(255,215,0,0.3);">🚀 LANCER LE SYSTÈME</button>
-        <div id="systemTicker" style="margin-top: 15px; font-family: monospace; font-size: 0.9em; color: #888; text-align: center;">
-            En attente de l'ordre de mission...
-        </div>
-        <div id="modelList" class="mousquetaires-list" style="margin-top: 10px; display: none;"></div>
+    <div class="config-bar">
+        <button id="btnLaunch" onclick="startAllSystems()">🚀 LANCER LE SYSTÈME</button>
+        <div id="systemTicker">Initialisation requise...</div>
+        <div id="modelList" class="mousquetaires-list"></div>
     </div>
 
-    <svg style="width:0; height:0; position:absolute;"><defs><linearGradient id="buckinghamGradient" x1="0%" y1="100%" x2="0%" y2="0%"><stop offset="0%" stop-color="#333" /><stop offset="50%" stop-color="#FFF" /><stop offset="100%" stop-color="#333" /></linearGradient></defs></svg>
-<div class="main-container">
-    <div class="input-area">
-        <div style="display: flex; gap: 5px;">
-            <input type="text" id="archiveIndex" placeholder="Index archive à rappeler (Optionnel)" style="flex: 1; background: #222; color: var(--gold); border: 1px solid #444; padding: 5px; border-radius: 4px;">
-            <button onclick="recallArchive()" style="background: var(--blue-royal); color: var(--gold); font-size: 0.8em;">📖 RAPPEL</button>
-        </div>
-        <textarea id="promptInput" placeholder="Exposez votre problématique ici..."></textarea>
+    <!-- Gradient Global -->
+    <svg style="width:0; height:0; position:absolute;">
+        <defs>
+            <linearGradient id="buckinghamGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+                <stop offset="0%" stop-color="#333" />
+                <stop offset="50%" stop-color="#FFF" />
+                <stop offset="100%" stop-color="#333" />
+            </linearGradient>
+        </defs>
+    </svg>
 
-        <div id="dropZone" ondragover="this.className='dragover'; event.preventDefault();" ondragleave="this.className='';" ondrop="handleDrop(event)">
-            🖼️ GLISSEZ UNE IMAGE ICI
-            <img id="imagePreview" src="">
+    <div class="main-container">
+        <!-- COLONNE GAUCHE : SAISIE -->
+        <div class="input-area">
+            <div style="display: flex; gap: 5px;">
+                <input type="text" id="archiveIndex" placeholder="Index archive..." style="flex: 1; background: #000; border: 1px solid #333; color: var(--gold); padding: 5px; font-size: 0.75em;">
+                <button class="btn-small" onclick="recallArchive()">📖 RAPPEL</button>
+            </div>
+
+            <textarea id="promptInput" placeholder="Exposez votre problématique technique..."></textarea>
+
+            <div id="dropZone" ondragover="this.className='dragover'; event.preventDefault();" ondragleave="this.className='';" ondrop="handleDrop(event)">
+                🖼️ DÉPÔT IMAGE / SCHÉMA
+                <img id="imagePreview">
+            </div>
+
+            <input type="file" id="fileInput" style="display: none;" onchange="handleFile(this)">
+
+            <div style="display: flex; gap: 5px;">
+                <button class="btn-small" onclick="document.getElementById('fileInput').click()">📁 FICHIER</button>
+                <button class="btn-small btn-gold" onclick="askAll()">LANCER LA CONSULTATION</button>
+            </div>
+
+            <div style="display: flex; gap: 5px;">
+                <button class="btn-small" style="color: #a0f;" onclick="cleanAndArchive()">🧹 ARCHIVER</button>
+                <button class="btn-small" style="color: #f44;" onclick="justTrash()">🗑️ JETER</button>
+                <button class="btn-small" style="color: #0ff;" onclick="resetInterface()">🎯 RESET</button>
+            </div>
+
+            <button id="btnSynthese" onclick="generateSynthese()" style="display:none; background: #600; color: #fff; font-size: 0.8em; padding: 10px; border: 1px solid var(--gold);">🔱 GÉNÉRER LA SYNTHÈSE SUPRÊME</button>
+            <button id="btnAuthorizeAll" onclick="authorizeAll()" style="display:none; background: #050; color: #fff; font-size: 0.8em; padding: 10px; border: 1px solid #0f0;">🔱 APPLIQUER LES MODIFICATIONS</button>
+
+            <div id="globalLoader" style="display:none; font-size: 0.7em; color: var(--gold); text-align: center; font-style: italic;">Consultation en cours...</div>
         </div>
 
-        <input type="file" id="fileInput" style="display: none;" onchange="handleFile(this)">
-        <div class="btn-group">
-            <button class="btn-file" onclick="document.getElementById('fileInput').click()">📁 Fichier</button>
-            <button class="btn-send" onclick="askAll()">LANCER LA CONSULTATION</button>
+        <!-- CENTRE : RÉSULTATS -->
+        <div class="responses-grid" id="responsesGrid"></div>
+
+        <!-- DROITE : PANNEAUX -->
+        <div class="right-panel">
+            <div style="border: 1px solid var(--border); padding: 8px;">
+                <h4 style="margin:0 0 5px 0; font-size: 0.75em; color: var(--gold);">📚 GRIMOIRES</h4>
+                <div id="archiveList" style="font-size: 0.7em; max-height: 150px; overflow-y: auto;"></div>
+            </div>
+
+            <div style="border: 1px solid var(--border); padding: 8px; background: #000;">
+                <h4 style="margin:0 0 5px 0; font-size: 0.75em; color: #0f0;">📟 CONSOLE</h4>
+                <div id="shellOutput" style="font-size: 0.65em; color: #666; height: 80px; overflow-y: auto; margin-bottom: 5px;"></div>
+                <input type="text" id="shellInput" value="ollama serve" style="width: 90%; background: transparent; color: #0f0; border: none; font-size: 0.7em; font-family: monospace;">
+                <button class="btn-small" style="width:100%; border-color: #0f0; color: #0f0;" onclick="executeShell()">EXÉCUTER</button>
+            </div>
+
+            <div style="border: 1px solid var(--border); padding: 8px;">
+                <h4 style="margin:0 0 5px 0; font-size: 0.75em; color: #0bf;">☁️ LE DUC (GEMINI)</h4>
+                <textarea id="geminiInput" placeholder="Expertise Cloud..." style="width: 90%; height: 60px; font-size: 0.7em;"></textarea>
+            </div>
         </div>
-        <div class="btn-group">
-            <button class="btn-file" style="background: #4b0082;" onclick="cleanAndArchive()">🧹 ARCHIVER</button>
-            <button class="btn-file" style="background: #8b0000;" onclick="justTrash()">🗑️ JETER</button>
-        </div>
-        <button id="btnSynthese" onclick="generateSynthese()" style="display:none; background: #8B0000; color: white; width: 100%; margin-top: 10px; padding: 10px; border-radius: 5px; font-weight: bold; border: 1px solid var(--gold);">🔱 GÉNÉRER LA SYNTHÈSE SUPRÊME</button>
-        <button id="btnAuthorizeAll" onclick="authorizeAll()" style="display:none; background: #006400; color: white; width: 100%; margin-top: 10px; padding: 15px; border-radius: 5px; font-weight: bold; border: 2px solid #00ff00; font-size: 1.1em;">🔱 AUTORISER LE SIÈGE (APPLIQUER TOUT)</button>
-        <div id="globalLoader" class="loader">Les mousquetaires dégainent leurs cerveaux...</div>
     </div>
 
-    <div class="responses-grid" id="responsesGrid">
-        <!-- Réponses ici -->
-    </div>
-
-    <div class="archive-panel">
-        <h3 style="color: var(--gold); font-size: 0.9em; margin: 0;">📚 GRIMOIRES</h3>
-        <div id="archiveList" style="display: flex; flex-direction: column; gap: 5px;">
-            Chargement...
+    <!-- MODAL PLEIN ÉCRAN -->
+    <div id="fullScreenModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeFullScreen()">&times;</span>
+            <h2 id="modalTitle" style="color: var(--gold); font-size: 1.2em; margin-top: 0;"></h2>
+            <div id="modalBody" class="response-content"></div>
         </div>
-
-        <hr style="border: 0; border-top: 1px solid #333; margin: 15px 0;">
-
-        <h3 style="color: #00ff00; font-size: 0.9em; margin: 0;">📟 CONSOLE SYSTÈME</h3>
-        <div style="background: #000; padding: 5px; border-radius: 4px; margin-top: 5px;">
-            <input type="text" id="shellInput" value="ollama serve" style="width: 100%; background: transparent; color: #00ff00; border: none; font-family: monospace; font-size: 0.8em;">
-            <div id="shellOutput" style="font-size: 0.7em; color: #888; margin-top: 5px; max-height: 100px; overflow-y: auto;">> Prêt pour vos ordres...</div>
-        </div>
-        <button onclick="executeShell()" style="width: 100%; margin-top: 5px; background: #222; color: #00ff00; font-size: 0.7em; border: 1px solid #00ff00;">EXÉCUTER</button>
-
-        <hr style="border: 0; border-top: 1px solid #333; margin: 15px 0;">
-
-        <h3 style="color: #00bfff; font-size: 0.9em; margin: 0;">☁️ LE DUC DE BUCKINGHAM (GEMINI)</h3>
-        <p style="font-size: 0.7em; color: #888;">Collez ici l'expertise de l'IA d'Android Studio pour l'inclure à la synthèse :</p>
-        <textarea id="geminiInput" placeholder="Collez ma réponse ici..." style="width: 100%; height: 100px; background: #000; color: #00bfff; border: 1px solid #004466; font-size: 0.8em;"></textarea>
     </div>
-</div>
 
-<div class="shell-console">
-    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
-        <span style="color: var(--gold); font-weight: bold;">⚡ CONSOLE DE COMMANDEMENT :</span>
-        <input type="text" id="shellInput" placeholder="Ex: pull llava, rm mistral..." style="flex: 1; background: #000; color: #0f0; border: 1px solid #333; padding: 5px; font-family: monospace;">
-        <button onclick="executeShell()" style="background: #333; color: white; padding: 5px 15px;">EXÉCUTER</button>
-    </div>
-    <div id="shellOutput" style="font-family: monospace; font-size: 0.85em; color: #888; background: #050505; padding: 10px; border-radius: 4px; max-height: 100px; overflow-y: auto;">
-        Système prêt. En attente d'ordres...
-    </div>
-</div>
-
-<div id="fullScreenModal" class="modal">
-    <span class="close-modal" onclick="closeFullScreen()">&times;</span>
-    <div id="modalTitle" style="color: var(--gold); font-size: 1.5em; margin-bottom: 20px; text-align: center; font-variant: small-caps;"></div>
-    <div id="modalBody" class="modal-content"></div>
-</div>
-
-<script>
-    const OLLAMA_URL = 'http://localhost:11434/api/chat';
-    const OLLAMA_GEN_URL = 'http://localhost:11434/api/generate';
-    let availableModels = [];
-    const mapping = {
-        'llama3:latest': 'Dartagnan (Leader)',
-        'mistral:latest': 'Aramis (L\'Érudit)',
-        'phi3:latest': 'Athos (Le Sage)',
-        'gemma2:latest': 'Porthos (La Force)',
-        'codestral:latest': 'M. de Tréville (L\'Expert Code)'
-    };
-
-    let collectiveContext = "";
-
-    async function cleanAndArchive() {
-        const grid = document.getElementById('responsesGrid');
-        const prompt = document.getElementById('promptInput').value;
-        if (!prompt && grid.innerHTML === "") return;
-
-        const data = {
-            prompt: prompt,
-            responses: Array.from(grid.querySelectorAll('.response-card')).map(c => ({
-                name: c.querySelector('h3').innerText,
-                content: c.querySelector('.response-content').innerText
-            }))
+    <script>
+        const OLLAMA_URL = 'http://localhost:11434/api/chat';
+        const roles = {
+            'llama3:latest': 'INGÉNIEUR SYSTÈME (Architecture H2C)',
+            'mistral:latest': 'THÉORICIEN (Physique des Plasmas)',
+            'phi3:latest': 'CALCULATEUR (Dynamique des Fluides)',
+            'gemma2:latest': 'EXPERT MATÉRIAUX (C/SiC & Nanoparticules)',
+            'codestral:latest': 'CHIRURGIEN DU CODE (Optimisation Algo)',
+            'deepseek-coder-v2:latest': 'LOGICIEN CRITIQUE (Détection de Failles)',
+            'mathstral:latest': 'MATHÉMATICIEN (Bilans Exergétiques)',
+            'qwen2.5:latest': 'MARÉCHAL VAUBAN (Ingénierie & Fortification)'
+        };
+        const mapping = {
+            'llama3:latest': 'Dartagnan',
+            'mistral:latest': 'Aramis',
+            'phi3:latest': 'Athos',
+            'gemma2:latest': 'Porthos',
+            'codestral:latest': 'Tréville',
+            'deepseek-coder-v2:latest': 'Colbert',
+            'mathstral:latest': 'Pascal',
+            'qwen2.5:latest': 'Vauban'
         };
 
-        try {
-            await fetch('http://localhost:8081/archive', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `content=${encodeURIComponent(JSON.stringify(data, null, 2))}`
-            });
-        } catch (e) {}
+        let availableModels = [];
 
-        // Nettoyage
-        document.getElementById('promptInput').value = "";
-        grid.innerHTML = "";
-        document.getElementById('btnSynthese').style.display = 'none';
-        document.getElementById('btnAuthorizeAll').style.display = 'none';
-        alert("🧹 Écran nettoyé et conversation archivée sur le Bureau !");
-    }
+        async function startAllSystems() {
+            const btn = document.getElementById('btnLaunch');
+            const ticker = document.getElementById('systemTicker');
+            const log = (msg, status, color = "#888") => ticker.innerHTML = `CMD: ${msg} | STATUT: <span style="color:${color}">${status}</span>`;
 
-    async function recallArchive(forcedId = null) {
-        const id = forcedId || document.getElementById('archiveIndex').value.trim();
-        if (!id) return;
-        try {
-            const r = await fetch(`http://localhost:8081/archive/${id}`);
-            if (r.ok) {
-                const data = await r.json();
-                document.getElementById('promptInput').value = `[RAPPEL ARCHIVE #${id}]\nAncien sujet: ${data.prompt}\n\nNouveau sujet: `;
-                alert("📖 Archive chargée dans le contexte !");
-            } else { alert("Archive introuvable."); }
-        } catch (e) { alert("Erreur de rappel."); }
-    }
+            btn.innerText = "⏳ INITIALISATION...";
+            btn.disabled = true;
 
-    async function fetchArchives() {
-        const container = document.getElementById('archiveList');
-        try {
-            const r = await fetch('http://localhost:8081/archives');
-            if (!r.ok) throw new Error();
-            const ids = await r.json();
-
-            container.innerHTML = '';
-            if (!ids || ids.length === 0) {
-                container.innerHTML = "<div style='font-size:0.8em; color:#666; padding:10px;'>Aucune archive (0)</div>";
-                return;
+            // 1. PONT ROYAL
+            try {
+                const r = await fetch('http://localhost:8081/archives');
+                if(r.ok) log("Pont Royal", "✅ ACTIF", "#0f0");
+            } catch(e) {
+                log("Pont Royal", "❌ ABSENT", "#f44");
+                alert("Lancez le Pont Royal dans Android Studio !");
+                btn.innerText = "❌ ÉCHEC"; btn.disabled = false; return;
             }
 
-            ids.forEach(id => {
-                const div = document.createElement('div');
-                div.className = 'archive-item';
-                div.innerText = `#${id}`;
-                div.onclick = () => recallArchive(id);
-                container.appendChild(div);
-            });
-        } catch (e) {
-            container.innerHTML = "<div style='font-size:0.8em; color:#ff4444; padding:10px;'>Pont Royal non détecté</div>";
-        }
-    }
-
-    function justTrash() {
-        if (confirm("🗑️ Voulez-vous vraiment jeter cette conversation sans l'archiver ?")) {
-            document.getElementById('promptInput').value = "";
-            document.getElementById('responsesGrid').innerHTML = "";
-            document.getElementById('btnSynthese').style.display = 'none';
-            document.getElementById('btnAuthorizeAll').style.display = 'none';
-        }
-    }
-
-    async function executeShell(customCmd = null) {
-        const cmd = customCmd || document.getElementById('shellInput').value.trim();
-        const out = document.getElementById('shellOutput');
-
-        const log = (msg, color = "#888") => {
-            const line = document.createElement('div');
-            line.style.color = color;
-            line.innerText = `> ${msg}`;
-            out.prepend(line);
-        };
-
-        log(`Exécution : ${cmd}`, "#00ff00");
-
-        if (cmd.startsWith('pull ')) {
-            const model = cmd.replace('pull ', '');
-            log(`Téléchargement de ${model} lancé...`);
+            // 2. OLLAMA
             try {
-                fetch('http://localhost:11434/api/pull', {
-                    method: 'POST',
-                    body: JSON.stringify({ name: model })
+                const r = await fetch('http://localhost:11434/api/tags');
+                if(r.ok) log("Ollama", "✅ PRÊT", "#0f0");
+            } catch(e) {
+                log("Ollama", "⚠️ RÉVEIL...", "#fa0");
+                await executeShell("ollama serve");
+                await new Promise(r => setTimeout(r, 5000));
+            }
+
+            // 3. FINAL
+            await fetchModels();
+            await fetchArchives();
+            ticker.innerHTML = "<b style='color:#0f0'>✨ ARSENAL OPÉRATIONNEL ✨</b>";
+            btn.innerText = "🔱 SYSTÈME ACTIF";
+            btn.style.background = "#050";
+            btn.disabled = false;
+        }
+
+        function resetInterface() {
+        document.getElementById('promptInput').style.width = '100%';
+        document.getElementById('promptInput').style.height = '120px';
+        document.getElementById('geminiInput').style.width = '100%';
+        document.getElementById('geminiInput').style.height = '60px';
+    }
+
+    async function fetchModels() {
+            try {
+                const r = await fetch('http://localhost:11434/api/tags');
+                const data = await r.json();
+                availableModels = data.models;
+                const container = document.getElementById('modelList');
+                container.innerHTML = '';
+                availableModels.forEach(m => {
+                    const nick = mapping[m.name] || m.name;
+                    const role = roles[m.name] || "Expert";
+                    const skill = role.includes('(') ? role.match(/\(([^)]+)\)/)[0] : "";
+
+                    const div = document.createElement('div');
+                    div.className = 'mousquetaire-item active';
+                    div.innerHTML = `<input type="checkbox" checked data-model="${m.name}"> <b>${nick}</b> <span style="font-size:0.8em; opacity:0.6;">${skill}</span>`;
+                    container.appendChild(div);
                 });
-            } catch(e) { log("Erreur réseau.", "#ff4444"); }
-        } else if (cmd === 'list') {
-            fetchModels();
-            log("Actualisation de la liste des experts.");
-        } else {
+            } catch (e) {}
+        }
+
+        async function askAll() {
+            const prompt = document.getElementById('promptInput').value;
+            if (!prompt) return;
+            const selected = document.querySelectorAll('#modelList input:checked');
+            const grid = document.getElementById('responsesGrid');
+            grid.innerHTML = '';
+            document.getElementById('globalLoader').style.display = 'block';
+
+            let context = "";
+            for (let cb of selected) {
+                const model = cb.getAttribute('data-model');
+                const nick = mapping[model] || model;
+                const res = await askOneWithCritique(model, nick, prompt, context);
+                context += `\n[${nick}]: ${res}\n`;
+            }
+            document.getElementById('globalLoader').style.display = 'none';
+            document.getElementById('btnSynthese').style.display = 'block';
+        }
+
+        async function askOneWithCritique(model, nickname, userPrompt, context) {
+            const grid = document.getElementById('responsesGrid');
+            const card = document.createElement('div');
+            card.className = 'response-card';
+            const cardId = `res-${model.replace(':','-')}`;
+            const swordId = `sword-${model.replace(':','-')}`;
+
+            card.innerHTML = `
+                <h3>
+                    <div class="sword-container" id="${swordId}">
+                        <svg class="sword-svg" viewBox="0 0 20 100">
+                            <path class="blade" d="M10 5 L13 85 L7 85 Z" />
+                            <rect class="guard" x="3" y="85" width="14" height="4" rx="2" />
+                            <rect class="hilt" x="8" y="89" width="4" height="8" fill="#5D2906" />
+                            <circle class="pommel" cx="10" cy="98" r="2" />
+                        </svg>
+                    </div>
+                    ${nickname}
+                    <div class="action-btns">
+                        <button class="act-btn" title="Plein écran" onclick="openFullScreen('${nickname}', '${cardId}')">⛶</button>
+                        <button class="act-btn" title="Copier" onclick="copyToClipboard('${cardId}')">📋</button>
+                        <button class="act-btn" title="Appliquer" onclick="applyToProject('${cardId}')">🚀</button>
+                    </div>
+                </h3>
+                <div class="response-content" id="${cardId}">Réflexion...</div>
+            `;
+            grid.appendChild(card);
+
+            const sword = document.getElementById(swordId);
+            sword.classList.add('state-received');
+
+            const systemMsg = `Tu es ${nickname}, expert ${myRole}.
+            TON ÉTHIQUE : 1. Si un projet de rupture (ex: H2C) est présenté, sois fidèle à sa physique. 2. Pour toute question générale, apporte l'état de l'art. 3. Ne dénigre jamais les méthodes classiques (ex: électrolyse), explique avec noblesse pourquoi elles sont adaptées ou non. Réponds en Français.`;
+            const payload = {
+                model: model,
+                messages: [
+                    { role: 'system', content: systemMsg },
+                    { role: 'user', content: (context ? `Contexte: ${context}\n\n` : "") + userPrompt }
+                ],
+                stream: false
+            };
+
+            if (currentImageData) payload.images = [currentImageData];
+
             try {
-                const response = await fetch('http://localhost:8081/forge', {
+                sword.classList.remove('state-received');
+                sword.classList.add('state-thinking');
+                const r = await fetch(OLLAMA_URL, { method: 'POST', body: JSON.stringify(payload) });
+                const data = await r.json();
+                const content = data.message.content;
+                document.getElementById(cardId).innerHTML = marked.parse(content);
+
+                sword.classList.remove('state-thinking');
+                sword.classList.add('state-done');
+                return content;
+            } catch (e) {
+                document.getElementById(cardId).innerText = "Erreur.";
+                return "";
+            }
+        }
+
+        function openFullScreen(nickname, cardId) {
+            document.getElementById('modalTitle').innerText = "RAPPORT DÉTAILLÉ : " + nickname;
+            document.getElementById('modalBody').innerHTML = document.getElementById(cardId).innerHTML;
+            document.getElementById('fullScreenModal').style.display = "block";
+        }
+
+        function closeFullScreen() { document.getElementById('fullScreenModal').style.display = "none"; }
+
+        async function executeShell(customCmd = null) {
+            const cmd = customCmd || document.getElementById('shellInput').value;
+            const out = document.getElementById('shellOutput');
+            const log = (m) => { const d = document.createElement('div'); d.innerText = `> ${m}`; out.prepend(d); };
+
+            try {
+                const r = await fetch('http://localhost:8081/forge', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: `command=${encodeURIComponent(cmd)}`
                 });
-                const msg = await response.text();
-                log(msg, msg.includes("✅") ? "#00ff00" : "#ffaa00");
-            } catch (e) {
-                log("Le Pont Royal ne répond pas.", "#ff4444");
-            }
-        }
-    }
-
-    async function startAllSystems() {
-        const btn = document.getElementById('btnLaunch');
-        const ticker = document.getElementById('systemTicker');
-
-        const updateTicker = (cmd, status, color = "#888") => {
-            ticker.innerHTML = `<div><span style="color:var(--gold)">CMD:</span> ${cmd} | <span style="color:${color}">STATUT: ${status}</span></div>`;
-        };
-
-        btn.innerText = "⏳ SÉQUENCE EN COURS...";
-        btn.disabled = true;
-
-        // ÉTAPE 1 : PONT ROYAL
-        updateTicker("./gradlew :app:runBridge", "Vérification...");
-        try {
-            const r = await fetch('http://localhost:8081/archives');
-            if(r.ok) {
-                updateTicker("Pont Royal", "✅ ACTIF", "#00ff00");
-            }
-        } catch(e) {
-            updateTicker("Pont Royal", "❌ ABSENT", "#ff4444");
-            alert("ERREUR CRITIQUE : Lancez le Pont Royal dans Android Studio !");
-            btn.innerText = "❌ ÉCHEC";
-            btn.disabled = false;
-            return;
+                log(await r.text());
+            } catch (e) { log("Erreur réseau"); }
         }
 
-        // ÉTAPE 2 : OLLAMA
-        updateTicker("ollama serve", "Vérification cerveau...");
-        try {
-            const r = await fetch('http://localhost:11434/api/tags');
-            if(r.ok) {
-                updateTicker("Ollama", "✅ PRÊT", "#00ff00");
-            }
-        } catch(e) {
-            updateTicker("ollama serve", "⚠️ SOMMEIL - Réveil en cours...", "#ffaa00");
-            await executeShell("ollama serve");
-            await new Promise(r => setTimeout(r, 5000));
-        }
-
-        // Vérification finale
-        try {
-            const r = await fetch('http://localhost:11434/api/tags');
-            if(r.ok) {
-                updateTicker("Ollama", "✅ PRÊT", "#00ff00");
-                fetchModels();
-                fetchArchives();
-                document.getElementById('modelList').style.display = 'flex';
-                ticker.innerHTML = "<div style='color:#00ff00; font-weight:bold;'>✨ SYSTÈME OPÉRATIONNEL - PRÊT AU COMBAT ✨</div>";
-                btn.innerText = "🔱 ARSENAL ACTIF";
-                btn.style.background = "#006400";
-                btn.style.color = "white";
-                btn.disabled = false;
-            }
-        } catch(e) {
-            updateTicker("Ollama", "❌ ÉCHEC RÉVEIL", "#ff4444");
-            btn.innerText = "❌ ÉCHEC";
-            btn.disabled = false;
-        }
-    }
-
-    function openFullScreen(nickname, cardId) {
-        const content = document.getElementById(cardId).innerHTML;
-        document.getElementById('modalTitle').innerText = "ÉTUDE DE " + nickname;
-        document.getElementById('modalBody').innerHTML = content;
-        document.getElementById('fullScreenModal').style.display = "block";
-    }
-
-    function closeFullScreen() {
-        document.getElementById('fullScreenModal').style.display = "none";
-    }
-
-    async function executeShell() {
-        const cmd = document.getElementById('shellInput').value.trim();
-        const out = document.getElementById('shellOutput');
-
-        if (cmd.startsWith('pull ')) {
-            const model = cmd.replace('pull ', '');
-            out.innerHTML = `> Téléchargement de ${model} lancé... (Vérifiez votre terminal Ollama)`;
+        // --- Fonctions utilitaires ---
+        async function fetchArchives() {
+            const container = document.getElementById('archiveList');
             try {
-                fetch('http://localhost:11434/api/pull', {
-                    method: 'POST',
-                    body: JSON.stringify({ name: model })
+                const r = await fetch('http://localhost:8081/archives');
+                const ids = await r.json();
+                container.innerHTML = ids.length ? "" : "Aucune archive.";
+                ids.forEach(id => {
+                    const div = document.createElement('div'); div.className = 'archive-item';
+                    div.innerText = `#${id}`; div.onclick = () => recallArchive(id);
+                    container.appendChild(div);
                 });
-            } catch(e) {}
-        } else if (cmd === 'list') {
-            fetchModels();
-            out.innerHTML = `> Liste des modèles actualisée.`;
-        } else {
-            out.innerHTML = `> Commande '${cmd}' envoyée au système.`;
-            forgeRequest(cmd);
+            } catch (e) {}
         }
-    }
 
-    async function fetchModels() {
-        fetchArchives(); // Charger les archives aussi
-        try {
-            const r = await fetch('http://localhost:11434/api/tags');
-            const data = await r.json();
-            availableModels = data.models;
-            renderModelList();
-        } catch (e) {
-            document.getElementById('modelList').innerHTML = "Erreur: Ollama est-il lancé ?";
+        async function recallArchive(id) {
+            const rid = id || document.getElementById('archiveIndex').value;
+            if(!rid) return;
+            const r = await fetch(`http://localhost:8081/archive/${rid}`);
+            const d = await r.json();
+            document.getElementById('promptInput').value = `[ARCHIVE #${rid}]\n${d.prompt}`;
         }
-    }
 
-    function renderModelList() {
-        const container = document.getElementById('modelList');
-        container.innerHTML = '';
-        availableModels.forEach(m => {
-            const nickname = mapping[m.name] || m.name;
-            const div = document.createElement('div');
-            div.className = 'mousquetaire-item active';
-            div.innerHTML = `<input type="checkbox" checked data-model="${m.name}"> ${nickname}`;
-            div.onclick = (e) => {
-                if(e.target.tagName !== 'INPUT') {
-                    const cb = div.querySelector('input');
-                    cb.checked = !cb.checked;
-                }
-            };
-            container.appendChild(div);
-        });
-    }
+        function copyToClipboard(id) { navigator.clipboard.writeText(document.getElementById(id).innerText); alert("Copié !"); }
 
-    let currentImageData = null;
+        function handleDrop(e) {
+            e.preventDefault(); const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    currentImageData = ev.target.result.split(',')[1];
+                    const img = document.getElementById('imagePreview');
+                    img.src = ev.target.result; img.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
 
-    function handleDrop(e) {
-        e.preventDefault();
-        document.getElementById('dropZone').className = '';
-        const file = e.dataTransfer.files[0];
-        if (file && file.type.startsWith('image/')) {
+        function handleFile(input) {
             const reader = new FileReader();
-            reader.onload = (event) => {
-                currentImageData = event.target.result.split(',')[1]; // Base64 pur
-                const img = document.getElementById('imagePreview');
-                img.src = event.target.result;
-                img.style.display = 'block';
-            };
-            reader.readAsDataURL(file);
-        }
-    }
-
-    async function askAll() {
-        const prompt = document.getElementById('promptInput').value;
-        if (!prompt) return;
-
-        const selectedCbs = document.querySelectorAll('#modelList input:checked');
-        const grid = document.getElementById('responsesGrid');
-        grid.innerHTML = '';
-        document.getElementById('globalLoader').style.display = 'block';
-
-        const cbs = Array.from(selectedCbs);
-        let collectiveContext = ""; // La mémoire de la table ronde
-
-        for (let i = 0; i < cbs.length; i++) {
-            const modelName = cbs[i].getAttribute('data-model');
-            const nickname = mapping[modelName] || modelName;
-
-            // On envoie le prompt d'origine ET ce que les autres ont déjà dit
-            const responseText = await askOneWithCritique(modelName, nickname, prompt, collectiveContext);
-            collectiveContext += `\n[L'AVIS DE ${nickname}]:\n${responseText}\n`;
+            reader.onload = (e) => document.getElementById('promptInput').value += `\n\nCONTENU: ${e.target.result}`;
+            reader.readAsText(input.files[0]);
         }
 
-        document.getElementById('globalLoader').style.display = 'none';
-        document.getElementById('btnSynthese').style.display = 'block';
-    }
+        async function generateSynthese() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            const grid = document.getElementById('responsesGrid');
+            const cards = grid.querySelectorAll('.response-card');
+            let all = "";
+            cards.forEach(c => all += `--- ${c.querySelector('h3').innerText} ---\n${c.querySelector('.response-content').innerText}\n\n`);
+            const gem = document.getElementById('geminiInput').value;
+            if(gem) all += `--- DUC DE BUCKINGHAM ---\n${gem}\n\n`;
 
-    // Mapping des spécialités pour une Vision 360°
-    const roles = {
-        'llama3:latest': 'ARCHITECTE (Logique & Structure)',
-        'mistral:latest': 'ÉRUDIT (Clarté & Maintenance)',
-        'phi3:latest': 'OPTIMISATEUR (Performance & Ressources)',
-        'gemma2:latest': 'GARDE DU CORPS (Sécurité & Cas Limites)',
-        'codestral:latest': 'CHIRURGIEN (Code Pur & APIs)'
-    };
+            const card = document.createElement('div');
+            card.className = 'response-card'; card.style.gridColumn = "1 / -1";
+            card.innerHTML = `<h3 style="color:#f40">🔱 SYNTHÈSE DU CARDINAL</h3><div class="response-content" id="res-syn">Analyse...</div>`;
+            grid.prepend(card);
 
-    async function askOneWithCritique(model, nickname, userPrompt, context) {
-        const grid = document.getElementById('responsesGrid');
-        const card = document.createElement('div');
-        card.className = 'response-card';
-        const cardId = `res-${model.replace(':','-')}`;
-        const swordId = `sword-${model.replace(':','-')}`;
-
-        card.innerHTML = `
-            <span id="icon-${model.replace(':','-')}" class="status-icon"></span>
-            <h3>
-                <div class="sword-container" id="${swordId}">
-                    <svg class="sword-svg" viewBox="0 0 20 100">
-                        <path class="blade" d="M10 5 L13 85 L7 85 Z" />
-                        <rect class="guard" x="3" y="85" width="14" height="4" rx="2" />
-                        <rect class="hilt" x="8" y="89" width="4" height="8" fill="#5D2906" />
-                        <circle class="pommel" cx="10" cy="98" r="2" />
-                    </svg>
-                </div>
-                ${nickname}
-                <div style="margin-left: auto; display: flex; gap: 5px;">
-                    <button class="copy-btn" title="Voir l'étude en plein écran" onclick="openFullScreen('${nickname}', '${cardId}')">⛶</button>
-                    <button class="copy-btn" title="Copier dans le presse-papier" onclick="copyToClipboard('${cardId}')">📋</button>
-                    <button class="copy-btn" title="Déposer le rapport sur le bureau" onclick="saveToDesktop('${nickname}', '${cardId}')">📥</button>
-                    <button class="copy-btn" style="border-color: #00ff00; color: #00ff00;" title="Appliquer les modifications au projet Android" onclick="applyToProject('${cardId}')">🚀</button>
-                    <button class="copy-btn" style="border-color: #ff00ff; color: #ff00ff;" title="Lancer une commande système (Forge)" onclick="openForge('${cardId}')">⚒️</button>
-                </div>
-            </h3>
-            <div class="response-content" id="${cardId}">Analyse en cours...</div>
-        `;
-        grid.appendChild(card);
-
-        const sword = document.getElementById(swordId);
-        sword.classList.add('state-received');
-
-        const myRole = roles[model] || 'EXPERT SENIOR';
-        const systemMsg = `Tu es ${nickname}, expert de haut vol.
-        IMPORTANT : Tu analyses le projet H2C. C'est une technologie de RUPTURE.
-        DIRECTIVES STRICTES :
-        1. RESTE fidèle à la physique décrite (Triboélectricité, Contra-rotation, Électrons chauds).
-        2. INTERDICTION de suggérer des méthodes classiques (ex: électrolyse standard) si elles contredisent le manifeste.
-        3. IDENTIFIE les points forts déjà présents (Zéro terres rares, Zéro pollution) comme des acquis, pas comme des points à chercher.
-        4. SOIS CHIRURGICAL : Si tu ne comprends pas une interaction particule/or, pose une question au lieu d'inventer.
-        5. RÉPONDS EXCLUSIVEMENT EN FRANÇAIS.`;
-
-        const instruction = context === ""
-            ? `Analyse cette section du manifeste H2C avec l'angle ${myRole}. Ne sois pas générique, sois disruptif.`
-            : `Voici le contexte des collègues. EN TANT QUE ${myRole}, critique radicalement toute suggestion "standard" qui affaiblirait l'innovation H2C.\n\nCONTEXTE :\n${context}`;
-
-        const payload = {
-            model: model,
-            messages: [
-                { role: 'system', content: systemMsg },
-                { role: 'user', content: instruction + "\n\nPROBLÈME : " + userPrompt }
-            ],
-            stream: false
-        };
-
-        if (currentImageData) {
-            payload.images = [currentImageData];
-        }
-
-        try {
-            sword.classList.remove('state-received');
-            sword.classList.add('state-thinking');
-
-            const response = await fetch(OLLAMA_URL, {
-                method: 'POST',
-                body: JSON.stringify(payload)
-            });
-            const data = await response.json();
-            const content = data.message.content;
-
-            // Rendu propre du Markdown (Texte + Code)
-            document.getElementById(cardId).innerHTML = marked.parse(content);
-
-            // Rendu des diagrammes Mermaid UNIQUEMENT si la classe .mermaid est présente
-            const mermaidNodes = document.getElementById(cardId).querySelectorAll('.mermaid');
-            if (mermaidNodes.length > 0) {
-                try {
-                    await mermaid.run({ nodes: mermaidNodes });
-                } catch(e) { console.log("Erreur diagramme"); }
-            }
-
-            sword.classList.remove('state-thinking');
-            sword.classList.add('state-done');
-            document.getElementById(`icon-${model.replace(':','-')}`).innerText = '✅';
-            return content;
-        } catch (e) {
-            document.getElementById(cardId).innerText = "Erreur de communication.";
-            sword.style.opacity = "0.3";
-            document.getElementById(`icon-${model.replace(':','-')}`).innerText = '❌';
-            return "";
-        }
-    }
-
-    async function generateSynthese() {
-        // Remonter en haut de page en douceur
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-
-        const grid = document.getElementById('responsesGrid');
-        const cards = grid.querySelectorAll('.response-card');
-        let allResponses = "";
-
-        cards.forEach(card => {
-            const name = card.querySelector('h3').innerText;
-            const text = card.querySelector('.response-content').innerText;
-            allResponses += `--- RÉPONSE DE ${name} ---\n${text}\n\n`;
-        });
-
-        // INCLUSION DE L'AVIS DU DUC (GEMINI)
-        const geminiAvis = document.getElementById('geminiInput').value.trim();
-        if (geminiAvis) {
-            allResponses += `--- EXPERTISE DU DUC DE BUCKINGHAM (IA ANDROID STUDIO) ---\n${geminiAvis}\n\n`;
-        }
-
-        // On crée une nouvelle carte pour la synthèse
-        const syntheseCard = document.createElement('div');
-        syntheseCard.className = 'response-card';
-        syntheseCard.style.gridColumn = "1 / -1"; // Prend toute la largeur
-        syntheseCard.style.borderColor = "#8B0000";
-        syntheseCard.innerHTML = `<h3 style="color:#FF4500">🔱 SYNTHÈSE SUPRÊME (CONSEIL DU ROI)</h3><div class="response-content" id="res-synthese">Analyse des rapports en cours...</div>`;
-        grid.prepend(syntheseCard);
-
-        try {
-            const promptSynthese = `Tu es le Cardinal de Richelieu, Grand Arbitre de la Science H2C.
-            TA MISSION : Faire une synthèse TECHNIQUE et CRITIQUE des rapports des mousquetaires.
-
-            RÈGLES D'OR DE COHÉRENCE PHYSIQUE :
-            1. REJETTE toute proposition "classique" (électrolyse, liquide) qui contredit le système H2C de triboélectricité contra-rotative sèche.
-            2. SANCTIONNE l'incompétence : si une IA a zappé les acquis du manifeste (zéro terre rare, décarbonation), ignore son avis.
-            3. SYNTHÉTISE uniquement ce qui renforce la technologie de rupture H2C (Electrons chauds, inclusions d'or, rendement nano-particules).
-            4. RÉDIGE un plan d'action qui respecte à 100% la vision du Général (Vahan).
-            5. DONNE LE CODE FINAL COMPLET pour chaque fichier concerné, en commençant chaque bloc par // PATH: chemin/du/fichier.kt.
-
-            RÉPONDS EXCLUSIVEMENT EN FRANÇAIS.
-
-            CONSEILS DES MOUSQUETAIRES :\n${allResponses}`;
-
-            const response = await fetch(OLLAMA_URL, {
-                method: 'POST',
-                body: JSON.stringify({
-                    model: 'codestral:latest',
-                    messages: [{ role: 'user', content: promptSynthese }],
-                    stream: false
-                })
-            });
-            const data = await response.json();
-            document.getElementById('res-synthese').innerText = data.message.content;
-            document.getElementById('btnAuthorizeAll').style.display = 'block';
-        } catch (e) {
-            document.getElementById('res-synthese').innerText = "Le Cardinal est indisponible pour le moment.";
-        }
-    }
-
-    async function authorizeAll() {
-        const syntheseContent = document.getElementById('res-synthese').innerText;
-        // On extrait tous les blocs qui commencent par // PATH:
-        const blocks = syntheseContent.split(/\/\/ PATH: /).slice(1);
-
-        if (blocks.length === 0) {
-            alert("Aucun fichier détecté dans la synthèse. Vérifiez que le Cardinal a bien indiqué les chemins (// PATH: ...)");
-            return;
-        }
-
-        if (confirm(`⚠️ ATTENTION : Vous allez appliquer ${blocks.length} modification(s) simultanément sur votre projet. Confirmer l'ordre d'attaque ?`)) {
-            for (let block of blocks) {
-                const lines = block.split('\n');
-                const path = lines[0].trim();
-                const content = lines.slice(1).join('\n').trim();
-
-                await saveRequest('apply', path, content);
-            }
-            alert("🏰 SIÈGE TERMINÉ : Le projet a été mis à jour selon les ordres du Cardinal !");
-        }
-    }
-
-    async function executeShell() {
-        const cmd = document.getElementById('shellInput').value.trim();
-        const out = document.getElementById('shellOutput');
-
-        if (cmd.startsWith('pull ')) {
-            const model = cmd.replace('pull ', '');
-            out.innerHTML = `> Téléchargement de ${model} lancé... (Vérifiez votre terminal Ollama)`;
+            const prompt = `Tu es le Cardinal de Richelieu. Fais une synthèse CRITIQUE H2C. REJETTE l'électrolyse. Focus: Triboélectricité. Rapports:\n${all}`;
             try {
-                fetch('http://localhost:11434/api/pull', {
-                    method: 'POST',
-                    body: JSON.stringify({ name: model })
-                });
-            } catch(e) {}
-        } else if (cmd === 'list') {
-            function openFullScreen(nickname, cardId) {
-        const content = document.getElementById(cardId).innerHTML;
-        document.getElementById('modalTitle').innerText = "ÉTUDE DE " + nickname;
-        document.getElementById('modalBody').innerHTML = content;
-        document.getElementById('fullScreenModal').style.display = "block";
-    }
-
-    function closeFullScreen() {
-        document.getElementById('fullScreenModal').style.display = "none";
-    }
-
-    fetchModels();
-            out.innerHTML = `> Liste des modèles actualisée.`;
-        } else {
-            out.innerHTML = `> Commande '${cmd}' envoyée au système.`;
+                const r = await fetch(OLLAMA_URL, { method: 'POST', body: JSON.stringify({ model: 'codestral:latest', messages: [{role:'user', content:prompt}], stream: false }) });
+                const d = await r.json();
+                document.getElementById('res-syn').innerHTML = marked.parse(d.message.content);
+                document.getElementById('btnAuthorizeAll').style.display = 'block';
+            } catch(e) { document.getElementById('res-syn').innerText = "Erreur."; }
         }
-    }
 
-    async function askOne(model, nickname, prompt) {
-        const grid = document.getElementById('responsesGrid');
-        const card = document.createElement('div');
-        card.className = 'response-card';
-        card.innerHTML = `<h3>${nickname}</h3><div class="response-content" id="res-${model.replace(':','-')}">En attente...</div>`;
-        grid.appendChild(card);
-
-        try {
-            const response = await fetch(OLLAMA_URL, {
-                method: 'POST',
-                body: JSON.stringify({
-                    model: model,
-                    messages: [
-                        { role: 'system', content: 'Tu es un ingénieur senior expert. Réponds avec précision.' },
-                        { role: 'user', content: prompt }
-                    ],
-                    stream: false
-                })
-            });
-            const data = await response.json();
-            document.getElementById(`res-${model.replace(':','-')}`).innerText = data.message.content;
-        } catch (e) {
-            document.getElementById(`res-${model.replace(':','-')}`).innerText = "Erreur de communication.";
-        }
-    }
-
-    function handleFile(input) {
-        const file = input.files[0];
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            document.getElementById('promptInput').value += `\n\n--- CONTENU DU FICHIER (${file.name}) ---\n${e.target.result}`;
-        };
-        reader.readAsText(file);
-    }
-
-    function copyToClipboard(id) {
-        const text = document.getElementById(id).innerText;
-        navigator.clipboard.writeText(text);
-        alert("Copié dans le presse-papier !");
-    }
-
-    async function saveToDesktop(nickname, id) {
-        const content = document.getElementById(id).innerText;
-        // Détection intelligente de l'extension
-        let extension = ".txt";
-        if (content.includes(",") && content.includes("\n")) extension = ".csv";
-
-        const defaultName = `${nickname.replace(/ /g, '_')}_${Date.now()}${extension}`;
-        const fileName = prompt("Nom du fichier à déposer sur le bureau :", defaultName);
-
-        if (!fileName) return;
-
-        try {
-            const response = await fetch('http://localhost:8081/save', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `name=${encodeURIComponent(fileName)}&content=${encodeURIComponent(content)}`
-            });
-            const msg = await response.text();
-            alert(msg);
-        } catch (e) {
-            alert("Erreur: Le Pont Royal n'est pas actif.");
-        }
-    }
-
-    async function applyToProject(id) {
-        const content = document.getElementById(id).innerText;
-        // On cherche le PATH dans le commentaire de l'IA
-        const pathMatch = content.match(/\/\/ PATH: ([^\s]+)/);
-        const path = pathMatch ? pathMatch[1] : "";
-
-        if (!path) {
-            const manualPath = prompt("L'IA n'a pas précisé le chemin. Vers quel fichier appliquer ? (ex: app/src/main/java/com/vahan/dartagnan/MainActivity.kt)", "");
-            if (!manualPath) return;
-            saveRequest('apply', manualPath, content);
-        } else {
-            if (confirm(`Voulez-vous vraiment écraser le fichier : ${path} ?`)) {
-                saveRequest('apply', path, content);
-            }
-        }
-    }
-
-    async function saveRequest(endpoint, path, content) {
-        try {
-            const response = await fetch(`http://localhost:8081/${endpoint}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `path=${encodeURIComponent(path)}&content=${encodeURIComponent(content)}`
-            });
-            const msg = await response.text();
-            alert(msg);
-        } catch (e) {
-            alert("Erreur: Le Pont Royal n'est pas actif.");
-        }
-    }
-
-    function openForge(id) {
-        const cmd = prompt("Entrez la commande de forge (ex: ffmpeg -i input.mp4 output.mp3 ou pandoc file.md -o file.pdf)", "");
-        if (cmd) {
-            forgeRequest(cmd);
-        }
-    }
-
-    async function forgeRequest(command) {
-        try {
-            const response = await fetch('http://localhost:8081/forge', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `command=${encodeURIComponent(command)}`
-            });
-            const msg = await response.text();
-            alert(msg);
-        } catch (e) {
-            alert("Erreur de Forge.");
-        }
-    }
-
-    function openFullScreen(nickname, cardId) {
-        const content = document.getElementById(cardId).innerHTML;
-        document.getElementById('modalTitle').innerText = "ÉTUDE DE " + nickname;
-        document.getElementById('modalBody').innerHTML = content;
-        document.getElementById('fullScreenModal').style.display = "block";
-    }
-
-    function closeFullScreen() {
-        document.getElementById('fullScreenModal').style.display = "none";
-    }
-
-    fetchModels();
-</script>
-
+        let currentImageData = null;
+        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+    </script>
 </body>
 </html>
