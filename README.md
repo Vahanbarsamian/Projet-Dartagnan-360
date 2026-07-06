@@ -53,9 +53,8 @@ Face à des technologies de pointe (Triboélectricité, Électrons chauds, Contr
 
 ### 2. Le Rituel de Lancement (À chaque fois)
 *   **Windows** : Double-cliquez sur `Dartagnan360.bat`.
-*   **Apple (macOS)** : 
-    1. Dans un terminal : `chmod +x Dartagnan360.command`
-    2. Lancez `Dartagnan360.command`.
+*   **Apple (macOS)** : Faites un clic droit sur `Dartagnan360.command` > Ouvrir.
+*   *Note : Le lanceur redémarrera automatiquement Ollama pour configurer les autorisations de sécurité (CORS).*
 *   **Interface** : Une fois la page ouverte, cliquez sur **🚀 LANCER LE SYSTÈME**.
 
 ---

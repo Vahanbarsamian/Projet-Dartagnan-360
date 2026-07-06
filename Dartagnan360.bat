@@ -1,27 +1,41 @@
 @echo off
 setlocal enabledelayedexpansion
-title ⚔️ DARTAGNAN 360 - CENTRE DE CONTROLE V4.2 🔱
+title ⚔️ DARTAGNAN 360 - CENTRE DE CONTROLE V4.4 🔱
 color 0B
 
-:: CONFIGURATION DU CHEMIN DU PROJET (CHEMIN ABSOLU)
 set "PROJECT_ROOT=C:\Users\vahan\AndroidStudioProjects\Dartagnan"
 
 echo ============================================================
-echo           DARTAGNAN 360 : LANCEUR AUTOMATIQUE V4.2
+echo           DARTAGNAN 360 : LANCEUR AUTOMATIQUE V4.4
 echo ============================================================
 
-:: 1. VERIFICATION OLLAMA
-echo 🧠 Verification d'Ollama...
+:: 1. DESTRUCTION DES INSTANCES REBELLES
+echo 🧹 Nettoyage des processus...
+taskkill /f /im "ollama.exe" >nul 2>nul
+taskkill /f /im "ollama app.exe" >nul 2>nul
+
+:: 2. VERIFICATION ET REVEIL OLLAMA
+echo 🧠 Preparation du cerveau...
+set "OLLAMA_EXE=ollama"
 where ollama >nul 2>nul
 if %errorlevel% neq 0 (
-    echo [!] ERREUR : Ollama n'est pas installe.
-    pause
-    exit
+    if exist "%LOCALAPPDATA%\Ollama\ollama.exe" (
+        set "OLLAMA_EXE=%LOCALAPPDATA%\Ollama\ollama.exe"
+    ) else (
+        echo [!] ERREUR : Ollama introuvable.
+        pause
+        exit
+    )
 )
-echo [+] Activation du cerveau...
-start /min cmd /c "set OLLAMA_ORIGINS=*&& ollama serve"
 
-:: 2. DOSSIERS DE TRAVAIL SUR LE BUREAU
+:: Force l'autorisation CORS au niveau local de la session
+set "OLLAMA_ORIGINS=*"
+echo [+] Autorisation CORS injectee : !OLLAMA_ORIGINS!
+
+:: Lancement d'Ollama dans une fenetre separee avec la variable FORCEE
+start "🧠 OLLAMA ENGINE" cmd /c "set OLLAMA_ORIGINS=*&& \"!OLLAMA_EXE!\" serve"
+
+:: 3. DOSSIERS DE TRAVAIL
 echo 📂 Verification des dossiers sur le Bureau...
 set "DESKTOP_DIR=%USERPROFILE%\Desktop"
 if exist "%USERPROFILE%\OneDrive\Bureau" set "DESKTOP_DIR=%USERPROFILE%\OneDrive\Bureau"
@@ -29,35 +43,24 @@ if exist "%USERPROFILE%\OneDrive\Desktop" set "DESKTOP_DIR=%USERPROFILE%\OneDriv
 
 mkdir "!DESKTOP_DIR!\Dartagnan_Rendus" 2>nul
 mkdir "!DESKTOP_DIR!\Dartagnan_Archives" 2>nul
-echo [+] Dossiers prets sur : !DESKTOP_DIR!
 
-:: 3. CONFIGURATION JAVA
+:: 4. CONFIGURATION JAVA
 if exist "C:\Program Files\Android\Android Studio\jbr" (
     set "JAVA_HOME=C:\Program Files\Android\Android Studio\jbr"
     set "PATH=!JAVA_HOME!\bin;!PATH!"
 )
 
-:: 4. LANCEMENT DU PONT ROYAL
+:: 5. LANCEMENT DU PONT ROYAL
 echo 🔱 Lancement du Pont Royal...
 cd /d "!PROJECT_ROOT!"
-if not exist "gradlew.bat" (
-    echo [!] ERREUR : gradlew.bat introuvable dans !PROJECT_ROOT!
-    pause
-    exit
-)
-:: Lancement de la tâche Gradle dans une fenêtre séparée
 start "🔱 DARTAGNAN BRIDGE" cmd /c "gradlew.bat :app:runBridge"
 
-:: 5. OUVERTURE DE L'INTERFACE
+:: 6. OUVERTURE DE L'INTERFACE
 echo 🌐 Ouverture de la Table Ronde...
-timeout /t 10 /nobreak >nul
-if exist "Vision360_Mousquetaires.html" (
-    start Vision360_Mousquetaires.html
-) else (
-    echo [!] ERREUR : Vision360_Mousquetaires.html introuvable dans !PROJECT_ROOT!
-)
+timeout /t 12 /nobreak >nul
+start Vision360_Mousquetaires.html
 
 echo ============================================================
-echo ✅ SYSTEME LANCE ! (Verifiez la fenetre 'DARTAGNAN BRIDGE')
+echo ✅ ARSENAL OPERATIONNEL ! (V4.4)
 echo ============================================================
 pause

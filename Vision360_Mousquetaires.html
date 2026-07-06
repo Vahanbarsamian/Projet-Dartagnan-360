@@ -294,12 +294,21 @@
         }
 
         async function fetchModels() {
+            const container = document.getElementById('modelList');
             try {
                 const r = await fetch('http://localhost:11434/api/tags');
+                if (!r.ok) throw new Error();
                 const data = await r.json();
                 availableModels = data.models;
+
+                if (availableModels.length === 0) {
+                    container.innerHTML = "<span style='color:#fa0; font-size:0.8em;'>⚠️ Aucun modèle trouvé. Tapez 'pull llama3.1' dans la console.</span>";
+                    return;
+                }
                 renderModelList();
-            } catch (e) {}
+            } catch (e) {
+                container.innerHTML = "<span style='color:#f44; font-size:0.8em;'>❌ Erreur de connexion : Quittez Ollama (barre des tâches) et relancez le .bat</span>";
+            }
         }
 
         function renderModelList() {
