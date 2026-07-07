@@ -1,7 +1,7 @@
 # ⚔️ THE MUSKETEER PROTOCOL : DARTAGNAN VISION 360° 🔱
-## *L'Arsenal de l'Ingénierie de Rupture — Version V5.6 "Indestructible"*
+## *L'Arsenal de l'Ingénierie de Rupture — Version V6.2 "Indestructible"*
 
-> **🔧 DERNIÈRE MISE À JOUR : 29 Octobre 2024 - 01:50**
+> **🔧 DERNIÈRE MISE À JOUR : 07 Juillet 2026 - 20:40 H**
 > * **Liaison Royale (Proxy Bridge)** : Stabilité totale, fini les erreurs CORS.
 > * **Baptême des Héros** : Mémoire persistante des noms adoubés.
 > * **UX Excellence** : Scroll auto et info-bulles sur les actions.
@@ -16,9 +16,13 @@
 > **"Ne demandez plus l'avis d'une IA, exigez celui d'un Conseil d'Experts. Pour le Roi, pour la Science et pour H2C !"** 🇫🇷✨
 
 ---
+<p></p>
+---
+<p></p>
+---
 
 <a name="français"></a>
-## 🇫🇷 NOTICE UNIVERSELLE D'UTILISATION (V5.5)
+## 🇫🇷 NOTICE UNIVERSELLE D'UTILISATION (V6.2)
 
 ### 🎯 POUR QUI ?
 *   **INGÉNIEURS & SCIENTIFIQUES** : Pour valider des concepts de rupture (H2C) sans fuite de données.
@@ -57,7 +61,7 @@
 ---
 
 <a name="english"></a>
-## 🇺🇸 UNIVERSAL USER GUIDE (V5.5)
+## 🇺🇸 UNIVERSAL USER GUIDE (V6.2)
 
 ### 🎯 TARGET AUDIENCE
 *   **ENGINEERS & SCIENTISTS**: Validate breakthrough concepts (H2C) without data leaks.
@@ -75,7 +79,7 @@
 ---
 
 <a name="español"></a>
-## 🇪🇸 GUÍA UNIVERSAL DE USO (V5.5)
+## 🇪🇸 GUÍA UNIVERSAL DE USO (V6.2)
 
 ### 🎯 ¿PARA QUIÉN?
 *   **INGENIEROS Y CIENTÍFICOS**: Validar conceptos de ruptura (H2C) sin fugas de datos.
