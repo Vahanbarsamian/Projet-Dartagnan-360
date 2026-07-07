@@ -15,6 +15,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.utils.io.*
 import kotlinx.coroutines.*
 import java.io.File
 
@@ -22,7 +23,6 @@ fun main() {
     val userHome = System.getProperty("user.home") ?: ""
     val projectRoot = System.getProperty("user.dir") ?: ""
     
-    // CONFIGURATION ASYNCHRONE OPTIMISÉE (V5.7 par M. de Tréville)
     val client = HttpClient(OkHttp) {
         install(HttpTimeout) {
             requestTimeoutMillis = 600000 
@@ -31,7 +31,6 @@ fun main() {
         }
     }
 
-    // Detection du Bureau (Compatible MinSDK 24)
     var desktopFile = File(userHome, "Desktop")
     if (File(userHome, "OneDrive/Bureau").exists()) desktopFile = File(userHome, "OneDrive/Bureau")
     else if (File(userHome, "OneDrive/Desktop").exists()) desktopFile = File(userHome, "OneDrive/Desktop")
@@ -42,8 +41,7 @@ fun main() {
     if (!archivesDir.exists()) archivesDir.mkdirs()
     if (!rendusDir.exists()) rendusDir.mkdirs()
 
-    println("🔱 LE PONT ROYAL V5.7 EST ACTIF (Optimisation Tréville)")
-    println("📂 Zone de Rendus : ${rendusDir.absolutePath}")
+    println("🔱 LE PONT ROYAL V6.0 EST ACTIF")
 
     embeddedServer(Netty, port = 8081) {
         install(CORS) {
@@ -68,6 +66,30 @@ fun main() {
                     } catch (e: Exception) {
                         call.respondText("{\"error\":\"Ollama indisponible\"}", ContentType.Application.Json, HttpStatusCode.ServiceUnavailable)
                     }
+                }
+            }
+
+            // NOUVEAU : RELAIS DE FLUX POUR LE TÉLÉCHARGEMENT (PULL)
+            post("/ollama/pull") {
+                val body = call.receiveText()
+                try {
+                    client.preparePost("http://127.0.0.1:11434/api/pull") {
+                        setBody(body)
+                    }.execute { response ->
+                        call.respondBytesWriter(ContentType.Application.Json) {
+                            val channel = response.bodyAsChannel()
+                            while (!channel.isClosedForRead) {
+                                val byteBuffer = ByteArray(1024)
+                                val read = channel.readAvailable(byteBuffer)
+                                if (read > 0) {
+                                    writeFully(byteBuffer, 0, read)
+                                    flush()
+                                }
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    call.respondText("{\"error\":\"Echec du relais de flux\"}", ContentType.Application.Json)
                 }
             }
 
@@ -111,7 +133,9 @@ fun main() {
                             val process = Runtime.getRuntime().exec(command)
                             process.waitFor()
                         }
-                    } catch (e: Exception) { }
+                    } catch (e: Exception) { 
+                        println("❌ Erreur Forge: ${e.message}") 
+                    }
                 }
                 call.respondText("⚡ Ordre de Forge envoyé.")
             }

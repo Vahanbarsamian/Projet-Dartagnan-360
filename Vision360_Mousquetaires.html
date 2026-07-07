@@ -145,7 +145,7 @@
                 <input type="text" id="archiveIndex" placeholder="Index archive..." style="flex: 1; background: #000; border: 1px solid #333; color: var(--gold); padding: 5px; font-size: 0.75em;">
                 <button class="btn-small" onclick="recallArchive()">📖 RAPPEL</button>
             </div>
-            <textarea id="promptInput" placeholder="Exposez votre problématique technique..."></textarea>
+            <textarea id="promptInput" oninput="toggleAskButton()" placeholder="Exposez votre problématique technique..."></textarea>
             <div id="dropZone" ondragover="this.className='dragover'; event.preventDefault();" ondragleave="this.className='';" ondrop="handleDrop(event)">
                 🖼️ DÉPÔT IMAGE / SCHÉMA
                 <img id="imagePreview">
@@ -153,7 +153,7 @@
             <input type="file" id="fileInput" style="display: none;" onchange="handleFile(this)">
             <div style="display: flex; gap: 5px;">
                 <button class="btn-small" onclick="document.getElementById('fileInput').click()">📁 FICHIER</button>
-                <button class="btn-small btn-gold" onclick="askAll()">LANCER LA CONSULTATION</button>
+                <button id="btnAskAll" class="btn-small btn-gold" onclick="askAll()" disabled style="opacity: 0.5; cursor: not-allowed;">LANCER LA CONSULTATION</button>
             </div>
             <div style="display: flex; gap: 5px;">
                 <button class="btn-small" style="color: #a0f;" onclick="cleanAndArchive()" title="Nettoyer et sauvegarder dans les grimoires">🧹 ARCHIVER</button>
@@ -168,6 +168,10 @@
         <div class="responses-grid" id="responsesGrid"></div>
 
         <div class="right-panel">
+            <div style="border: 1px solid var(--gold); padding: 8px; background: rgba(255, 215, 0, 0.05); margin-bottom: 10px;">
+                <h4 style="margin:0 0 5px 0; font-size: 0.75em; color: var(--gold);">🔱 MAINTENANCE ARSENAL</h4>
+                <button class="btn-small btn-gold" style="width:100%; font-size: 0.65em;" onclick="updateAllModels()">🔄 TOUTE LA GARDE</button>
+            </div>
             <div style="border: 1px solid var(--border); padding: 8px;">
                 <h4 style="margin:0 0 5px 0; font-size: 0.75em; color: var(--gold);">📚 GRIMOIRES</h4>
                 <div id="archiveList" style="font-size: 0.7em; max-height: 150px; overflow-y: auto;"></div>
@@ -211,15 +215,15 @@
             'llava:latest': 'L\'OEIL DU ROI (Vision & Schémas)'
         };
         const defaultMapping = {
-            'llama3.1:latest': 'Dartagnan',
-            'llama3:latest': 'Dartagnan',
+            'llama3.1:latest': 'Dartagnan (3.1)',
+            'llama3:latest': 'Dartagnan (3.0)',
             'mistral:latest': 'Aramis',
             'phi3:latest': 'Athos',
             'gemma2:latest': 'Porthos',
             'codestral:latest': 'Tréville',
             'deepseek-coder-v2:latest': 'Colbert',
-            'deepseek-coder-v2:lite': 'Colbert',
-            'qwen2.5-coder:7b': 'Vauban',
+            'deepseek-coder-v2:lite': 'Colbert Lite',
+            'qwen2.5-coder:7b': 'Vauban Coder',
             'mathstral:latest': 'Pascal',
             'qwen2.5:latest': 'Vauban',
             'mistral-nemo:latest': 'Lavoisier',
@@ -290,13 +294,21 @@
             const container = document.getElementById('modelList');
             container.innerHTML = '';
 
-            // Liste des noms déjà pris (pour les masquer dans les choix)
+            // Liste des noms déjà pris
             const takenNames = Object.values(mapping);
 
             availableModels.forEach(m => {
-                const isKnown = mapping[m.name];
-                const nick = mapping[m.name] || `Soldat ${m.name.split(':')[0]}`;
-                const role = roles[m.name] || "Expert Indépendant";
+                const modelName = m.name;
+                const modelBase = modelName.split(':')[0];
+                const modelTag = modelName.split(':')[1] || "latest";
+
+                const isKnown = mapping[modelName] || mapping[`${modelBase}:latest`];
+                const baseNick = mapping[modelName] || mapping[`${modelBase}:latest`] || `Soldat ${modelBase}`;
+
+                // On affiche le tag uniquement s'il n'est pas déjà dans le nom de base
+                const nick = baseNick.includes(modelTag) ? baseNick : `${baseNick} [${modelTag}]`;
+
+                const role = roles[modelName] || roles[`${modelBase}:latest`] || "Expert Indépendant";
                 const skill = role.includes('(') ? role.match(/\(([^)]+)\)/)[0] : role;
                 const div = document.createElement('div');
                 div.className = 'mousquetaire-item active';
@@ -304,15 +316,68 @@
                 let baptemeHtml = "";
                 if (!isKnown) {
                     const availableEpicNames = epicNames.filter(name => !takenNames.includes(name));
-                    baptemeHtml = `<select onchange="baptiser('${m.name}', this.value)" style="background:#000; color:var(--gold); border:none; font-size:0.8em; cursor:pointer;">
+                    baptemeHtml = `<select onchange="baptiser('${modelName}', this.value)" style="background:#000; color:var(--gold); border:none; font-size:0.8em; cursor:pointer;">
                         <option value="">🎖️ BAPTISER</option>
                         ${availableEpicNames.map(n => `<option value="${n}">${n}</option>`).join('')}
                     </select>`;
                 }
 
-                div.innerHTML = `<input type="checkbox" checked data-model="${m.name}"> <b>${nick}</b> ${baptemeHtml} <span style="font-size:0.8em; opacity:0.6;">${skill}</span> <button class="act-btn" onclick="executeShell('pull ${m.name}')" title="Mise à jour">🔄</button>`;
+                div.innerHTML = `<input type="checkbox" checked data-model="${modelName}"> <b>${nick}</b> ${baptemeHtml} <span style="font-size:0.8em; opacity:0.6;">${skill}</span> <button class="act-btn" style="color:var(--gold); border-color:var(--gold);" onclick="pullModel('${modelName}')" title="Mettre à jour">🔄</button>`;
                 container.appendChild(div);
             });
+        }
+
+        async function pullModel(modelName) {
+            const out = document.getElementById('shellOutput');
+            const log = (m, c="#888") => {
+                const d = document.createElement('div'); d.style.color = c; d.innerText = `> ${m}`; out.prepend(d);
+            };
+
+            log(`Lancement du téléchargement : ${modelName}...`, "#fa0");
+
+            try {
+                const response = await fetch(`${BRIDGE_URL}/ollama/pull`, {
+                    method: 'POST',
+                    body: JSON.stringify({ name: modelName })
+                });
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let lastStatus = "";
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value, { stream: true });
+                    const lines = chunk.split('\n');
+
+                    for (let line of lines) {
+                        if (!line.trim()) continue;
+                        try {
+                            const data = JSON.parse(line);
+                            if (data.status) {
+                                let message = data.status;
+                                if (data.completed && data.total) {
+                                    const percent = Math.round((data.completed / data.total) * 100);
+                                    message += ` (${percent}%)`;
+                                }
+
+                                if (lastStatus === data.status && out.firstChild) {
+                                    out.firstChild.innerText = `> ${message}`;
+                                } else {
+                                    log(message, "#0f0");
+                                    lastStatus = data.status;
+                                }
+                            }
+                        } catch (e) {}
+                    }
+                }
+                log(`✅ ${modelName} est prêt au combat !`, "#0f0");
+                fetchModels();
+            } catch (e) {
+                log(`❌ Erreur : ${e.message}`, "#f44");
+            }
         }
 
         function baptiser(modelName, newNick) {
@@ -321,6 +386,29 @@
                 // On enregistre le baptême dans le navigateur pour qu'il soit définitif
                 localStorage.setItem('dartagnan_mapping', JSON.stringify(mapping));
                 renderModelList();
+            }
+        }
+
+        function toggleAskButton() {
+            const prompt = document.getElementById('promptInput').value.trim();
+            const btn = document.getElementById('btnAskAll');
+            if (prompt.length > 0) {
+                btn.disabled = false;
+                btn.style.opacity = "1";
+                btn.style.cursor = "pointer";
+            } else {
+                btn.disabled = true;
+                btn.style.opacity = "0.5";
+                btn.style.cursor = "not-allowed";
+            }
+        }
+
+        async function updateAllModels() {
+            if (confirm("🛡️ Voulez-vous lancer la mise à jour visuelle de tous les modèles installés ?")) {
+                for (let m of availableModels) {
+                    await pullModel(m.name);
+                }
+                alert("🔱 Toute la garde est à jour et prête au combat !");
             }
         }
 
@@ -386,6 +474,7 @@
         function resetInterface() {
             const pi = document.getElementById('promptInput'); const gi = document.getElementById('geminiInput');
             pi.style.width = '100%'; pi.style.height = '120px'; gi.style.width = '100%'; gi.style.height = '60px';
+            toggleAskButton();
         }
 
         async function executeShell(cmd) {
@@ -418,6 +507,7 @@
                 const r = await fetch(`${BRIDGE_URL}/archive/${rid}`);
                 const d = await r.json();
                 document.getElementById('promptInput').value = `[ARCHIVE #${rid}]\n${d.prompt}`;
+                toggleAskButton();
             } catch(e) {}
         }
 
@@ -526,6 +616,7 @@
                     grid.innerHTML = "";
                     document.getElementById('promptInput').value = "";
                     document.getElementById('btnSynthese').style.display = 'none';
+                    toggleAskButton();
                     fetchArchives();
                 }
             } catch (e) {
@@ -540,6 +631,7 @@
                 document.getElementById('geminiInput').value = "";
                 document.getElementById('btnSynthese').style.display = 'none';
                 document.getElementById('btnAuthorizeAll').style.display = 'none';
+                toggleAskButton();
             }
         }
 
