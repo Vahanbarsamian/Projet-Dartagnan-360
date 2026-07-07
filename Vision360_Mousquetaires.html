@@ -210,7 +210,7 @@
             'mistral-nemo:latest': 'LAVOISIER (Physique des Gaz & Plasmas)',
             'llava:latest': 'L\'OEIL DU ROI (Vision & Schémas)'
         };
-        const mapping = {
+        const defaultMapping = {
             'llama3.1:latest': 'Dartagnan',
             'llama3:latest': 'Dartagnan',
             'mistral:latest': 'Aramis',
@@ -225,6 +225,11 @@
             'mistral-nemo:latest': 'Lavoisier',
             'llava:latest': 'L\'Oeil'
         };
+
+        // On charge les baptêmes précédents ou on utilise le mapping par défaut
+        const savedMapping = JSON.parse(localStorage.getItem('dartagnan_mapping') || '{}');
+        const mapping = { ...defaultMapping, ...savedMapping };
+
         const epicNames = ["Planchet", "Grimaud", "Mousqueton", "Bazin", "Milady", "Rochefort", "Constance", "Lord Winter", "Felton", "Jussac", "Cahusac", "Bernajoux", "Mme de Chevreuse"];
         let availableModels = [];
         let currentImageData = null;
@@ -284,6 +289,10 @@
         function renderModelList() {
             const container = document.getElementById('modelList');
             container.innerHTML = '';
+
+            // Liste des noms déjà pris (pour les masquer dans les choix)
+            const takenNames = Object.values(mapping);
+
             availableModels.forEach(m => {
                 const isKnown = mapping[m.name];
                 const nick = mapping[m.name] || `Soldat ${m.name.split(':')[0]}`;
@@ -291,14 +300,28 @@
                 const skill = role.includes('(') ? role.match(/\(([^)]+)\)/)[0] : role;
                 const div = document.createElement('div');
                 div.className = 'mousquetaire-item active';
-                let baptemeHtml = isKnown ? "" : `<select onchange="baptiser('${m.name}', this.value)" style="background:#000; color:var(--gold); border:none; font-size:0.8em; cursor:pointer;"><option value="">🎖️ BAPTISER</option>${epicNames.map(n => `<option value="${n}">${n}</option>`).join('')}</select>`;
+
+                let baptemeHtml = "";
+                if (!isKnown) {
+                    const availableEpicNames = epicNames.filter(name => !takenNames.includes(name));
+                    baptemeHtml = `<select onchange="baptiser('${m.name}', this.value)" style="background:#000; color:var(--gold); border:none; font-size:0.8em; cursor:pointer;">
+                        <option value="">🎖️ BAPTISER</option>
+                        ${availableEpicNames.map(n => `<option value="${n}">${n}</option>`).join('')}
+                    </select>`;
+                }
+
                 div.innerHTML = `<input type="checkbox" checked data-model="${m.name}"> <b>${nick}</b> ${baptemeHtml} <span style="font-size:0.8em; opacity:0.6;">${skill}</span> <button class="act-btn" onclick="executeShell('pull ${m.name}')" title="Mise à jour">🔄</button>`;
                 container.appendChild(div);
             });
         }
 
         function baptiser(modelName, newNick) {
-            if (newNick) { mapping[modelName] = newNick; renderModelList(); }
+            if (newNick) {
+                mapping[modelName] = newNick;
+                // On enregistre le baptême dans le navigateur pour qu'il soit définitif
+                localStorage.setItem('dartagnan_mapping', JSON.stringify(mapping));
+                renderModelList();
+            }
         }
 
         async function askAll() {
@@ -324,7 +347,7 @@
             card.className = 'response-card';
             const cardId = `res-${model.replace(':','-')}`;
             const swordId = `sword-${model.replace(':','-')}`;
-            card.innerHTML = `<h3><div class="sword-container" id="${swordId}"><svg class="sword-svg" viewBox="0 0 20 100"><path class="blade" d="M10 5 L13 85 L7 85 Z" /><rect class="guard" x="3" y="85" width="14" height="4" rx="2" /><rect class="hilt" x="8" y="89" width="4" height="8" fill="#5D2906" /><circle class="pommel" cx="10" cy="98" r="2" /></svg></div>${nickname}<div class="action-btns"><button class="act-btn" onclick="openFullScreen('${nickname}', '${cardId}')">⛶</button><button class="act-btn" onclick="copyToClipboard('${cardId}')">📋</button><button class="act-btn" onclick="applyToProject('${cardId}')">🚀</button></div></h3><div class="response-content" id="${cardId}">Réflexion...</div>`;
+            card.innerHTML = `<h3><div class="sword-container" id="${swordId}"><svg class="sword-svg" viewBox="0 0 20 100"><path class="blade" d="M10 5 L13 85 L7 85 Z" /><rect class="guard" x="3" y="85" width="14" height="4" rx="2" /><rect class="hilt" x="8" y="89" width="4" height="8" fill="#5D2906" /><circle class="pommel" cx="10" cy="98" r="2" /></svg></div>${nickname}<div class="action-btns"><button class="act-btn" title="Plein écran" onclick="openFullScreen('${nickname}', '${cardId}')">⛶</button><button class="act-btn" title="Copier dans le presse-papier" onclick="copyToClipboard('${cardId}')">📋</button><button class="act-btn" title="Appliquer au projet" onclick="applyToProject('${cardId}')">🚀</button></div></h3><div class="response-content" id="${cardId}">Réflexion...</div>`;
             grid.appendChild(card);
             const sword = document.getElementById(swordId);
             sword.classList.add('state-received');
@@ -336,14 +359,20 @@
                 sword.classList.remove('state-received'); sword.classList.add('state-thinking');
                 const r = await fetch(`${BRIDGE_URL}/ollama/chat`, { method: 'POST', body: JSON.stringify(payload) });
                 const data = await r.json();
+
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
                 const content = data.message.content;
                 document.getElementById(cardId).innerHTML = marked.parse(content);
                 sword.classList.remove('state-thinking'); sword.classList.add('state-done');
                 document.getElementById('btnSynthese').style.display = 'block';
                 return content;
             } catch (e) {
-                document.getElementById(cardId).innerText = "Erreur.";
+                document.getElementById(cardId).innerHTML = `<span style="color:#f44;">❌ ${e.message || "Erreur de calcul"}</span><br><small style="opacity:0.5;">(Modèle trop lourd pour le GPU ?)</small>`;
                 sword.style.opacity = "0.3";
+                document.getElementById('btnSynthese').style.display = 'block';
                 return "";
             }
         }
@@ -408,11 +437,26 @@
         }
 
         async function generateSynthese() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            const btn = document.getElementById('btnSynthese');
+            if (btn.disabled) return;
+
+            // Remonter en haut de la grille des réponses en douceur
+            document.getElementById('responsesGrid').scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Désactiver le bouton pour éviter les impulsions multiples
+            btn.disabled = true;
+            btn.innerText = "⏳ LE CARDINAL ANALYSE...";
+            btn.style.opacity = "0.5";
+
             const grid = document.getElementById('responsesGrid');
             const cards = grid.querySelectorAll('.response-card');
             let all = "";
-            cards.forEach(c => all += `--- ${c.querySelector('h3').innerText} ---\n${c.querySelector('.response-content').innerText}\n\n`);
+            cards.forEach(c => {
+                const content = c.querySelector('.response-content').innerText;
+                if (!content.includes("❌")) { // On n'inclut pas les erreurs dans la synthèse
+                    all += `--- ${c.querySelector('h3').innerText} ---\n${content}\n\n`;
+                }
+            });
             const gem = document.getElementById('geminiInput').value;
             if(gem) all += `--- DUC DE BUCKINGHAM ---\n${gem}\n\n`;
             const card = document.createElement('div'); card.className = 'response-card'; card.style.gridColumn = "1 / -1";
@@ -421,9 +465,19 @@
             const prompt = `Tu es le Cardinal de Richelieu. Fais une synthèse CRITIQUE. Focus: H2C / Triboélectricité. Rapports:\n${all}`;
             try {
                 const r = await fetch(`${BRIDGE_URL}/ollama/chat`, { method: 'POST', body: JSON.stringify({ model: 'codestral:latest', messages: [{role:'user', content:prompt}], stream: false }) });
-                const d = await r.json(); document.getElementById('res-syn').innerHTML = marked.parse(d.message.content);
+                const d = await r.json();
+                document.getElementById('res-syn').innerHTML = marked.parse(d.message.content);
                 document.getElementById('btnAuthorizeAll').style.display = 'block';
-            } catch(e) { document.getElementById('res-syn').innerText = "Erreur."; }
+
+                // On réactive le bouton une fois fini (optionnel, pour permettre une nouvelle synthèse)
+                btn.disabled = false;
+                btn.innerText = "🔱 GÉNÉRER UNE NOUVELLE SYNTHÈSE";
+                btn.style.opacity = "1";
+            } catch(e) {
+                document.getElementById('res-syn').innerText = "Erreur.";
+                btn.disabled = false;
+                btn.innerText = "🔱 RÉESSAYER LA SYNTHÈSE";
+            }
         }
 
         async function authorizeAll() {
