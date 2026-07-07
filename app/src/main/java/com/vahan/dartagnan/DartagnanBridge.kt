@@ -15,32 +15,35 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.plugins.contentnegotiation.*
+import kotlinx.coroutines.*
 import java.io.File
 
 fun main() {
     val userHome = System.getProperty("user.home") ?: ""
     val projectRoot = System.getProperty("user.dir") ?: ""
     
-    // CONFIGURATION DU CLIENT AVEC PATIENCE INFINIE (Timeout)
+    // CONFIGURATION ASYNCHRONE OPTIMISÉE (V5.7 par M. de Tréville)
     val client = HttpClient(OkHttp) {
         install(HttpTimeout) {
-            requestTimeoutMillis = 600000 // 10 minutes d'attente
+            requestTimeoutMillis = 600000 
             connectTimeoutMillis = 600000
             socketTimeoutMillis = 600000
         }
     }
 
-    var desktopPath = File(userHome, "Desktop")
-    if (File(userHome, "OneDrive/Bureau").exists()) desktopPath = File(userHome, "OneDrive/Bureau")
-    else if (File(userHome, "OneDrive/Desktop").exists()) desktopPath = File(userHome, "OneDrive/Desktop")
-    
-    val desktopDir = File(desktopPath, "Dartagnan_Rendus").absolutePath
-    val archivesDir = File(desktopPath, "Dartagnan_Archives")
+    // Detection du Bureau (Compatible MinSDK 24)
+    var desktopFile = File(userHome, "Desktop")
+    if (File(userHome, "OneDrive/Bureau").exists()) desktopFile = File(userHome, "OneDrive/Bureau")
+    else if (File(userHome, "OneDrive/Desktop").exists()) desktopFile = File(userHome, "OneDrive/Desktop")
+
+    val rendusDir = File(desktopFile, "Dartagnan_Rendus")
+    val archivesDir = File(desktopFile, "Dartagnan_Archives")
     
     if (!archivesDir.exists()) archivesDir.mkdirs()
-    if (!File(desktopDir).exists()) File(desktopDir).mkdirs()
+    if (!rendusDir.exists()) rendusDir.mkdirs()
 
-    println("🔱 LE PONT ROYAL V5.2 EST ACTIF (Mode Patience Infinie)")
+    println("🔱 LE PONT ROYAL V5.7 EST ACTIF (Optimisation Tréville)")
+    println("📂 Zone de Rendus : ${rendusDir.absolutePath}")
 
     embeddedServer(Netty, port = 8081) {
         install(CORS) {
@@ -50,33 +53,32 @@ fun main() {
             allowMethod(HttpMethod.Get)
             allowHeader(HttpHeaders.ContentType)
         }
-        install(ContentNegotiation) {
-            json()
-        }
+        install(ContentNegotiation) { json() }
         
         routing {
-            post("/save") { saveFile(call, desktopDir) }
-            post("/apply") { saveFile(call, projectRoot) }
+            post("/save") { saveFileAsync(call, rendusDir.absolutePath) }
+            post("/apply") { saveFileAsync(call, projectRoot) }
             
             post("/ollama/chat") {
                 val body = call.receiveText()
-                try {
-                    val response: HttpResponse = client.post("http://127.0.0.1:11434/api/chat") {
-                        setBody(body)
+                withContext(Dispatchers.IO) {
+                    try {
+                        val response: HttpResponse = client.post("http://127.0.0.1:11434/api/chat") { setBody(body) }
+                        call.respondText(response.bodyAsText(), ContentType.Application.Json)
+                    } catch (e: Exception) {
+                        call.respondText("{\"error\":\"Ollama indisponible\"}", ContentType.Application.Json, HttpStatusCode.ServiceUnavailable)
                     }
-                    call.respondText(response.bodyAsText(), ContentType.Application.Json)
-                } catch (e: Exception) {
-                    println("❌ Erreur Ollama : ${e.message}")
-                    call.respondText("{\"error\":\"Ollama a mis trop de temps a repondre\"}", ContentType.Application.Json, HttpStatusCode.GatewayTimeout)
                 }
             }
 
             get("/ollama/tags") {
-                try {
-                    val response: HttpResponse = client.get("http://127.0.0.1:11434/api/tags")
-                    call.respondText(response.bodyAsText(), ContentType.Application.Json)
-                } catch (e: Exception) {
-                    call.respondText("{\"models\":[]}", ContentType.Application.Json)
+                withContext(Dispatchers.IO) {
+                    try {
+                        val response: HttpResponse = client.get("http://127.0.0.1:11434/api/tags")
+                        call.respondText(response.bodyAsText(), ContentType.Application.Json)
+                    } catch (e: Exception) {
+                        call.respondText("{\"models\":[]}", ContentType.Application.Json)
+                    }
                 }
             }
 
@@ -84,7 +86,9 @@ fun main() {
                 val params = call.receiveParameters()
                 val content = params["content"] ?: ""
                 val index = java.text.SimpleDateFormat("yyyyMMdd_HHmmss").format(java.util.Date())
-                File(archivesDir, "archive_$index.json").writeText(content)
+                withContext(Dispatchers.IO) {
+                    File(archivesDir, "archive_$index.json").writeText(content)
+                }
                 call.respondText("📚 Archive sauvegardée !")
             }
 
@@ -98,29 +102,33 @@ fun main() {
             post("/forge") {
                 val params = call.receiveParameters()
                 val command = params["command"] ?: ""
-                try {
-                    val isService = command.contains("serve") || command.contains("start")
-                    if (isService) {
-                        Runtime.getRuntime().exec("cmd /c start /min $command")
-                        call.respondText("⚡ Service lancé.")
-                    } else {
-                        val process = Runtime.getRuntime().exec(command)
-                        val result = process.waitFor()
-                        call.respondText(if (result == 0) "✅ Forge réussie." else "❌ Erreur $result")
-                    }
-                } catch (e: Exception) { call.respondText("❌ Erreur : ${e.message}") }
+                launch(Dispatchers.IO) {
+                    try {
+                        val isService = command.contains("serve") || command.contains("start")
+                        if (isService) {
+                            Runtime.getRuntime().exec("cmd /c start /min $command")
+                        } else {
+                            val process = Runtime.getRuntime().exec(command)
+                            process.waitFor()
+                        }
+                    } catch (e: Exception) { }
+                }
+                call.respondText("⚡ Ordre de Forge envoyé.")
             }
         }
     }.start(wait = true)
 }
 
-suspend fun saveFile(call: ApplicationCall, baseDir: String) {
+suspend fun saveFileAsync(call: ApplicationCall, baseDir: String) {
     val params = call.receiveParameters()
     val path = params["path"] ?: ""
     val content = params["content"] ?: ""
     val name = params["name"] ?: "rendu_${System.currentTimeMillis()}.txt"
     val targetFile = if (path.isNotEmpty()) File(baseDir, path) else File(baseDir, name)
-    targetFile.parentFile?.mkdirs()
-    targetFile.writeText(content)
+    
+    withContext(Dispatchers.IO) {
+        targetFile.parentFile?.mkdirs()
+        targetFile.writeText(content)
+    }
     call.respondText("🔱 Succès : ${targetFile.name}")
 }

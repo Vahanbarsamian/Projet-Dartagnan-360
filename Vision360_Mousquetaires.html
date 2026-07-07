@@ -156,9 +156,9 @@
                 <button class="btn-small btn-gold" onclick="askAll()">LANCER LA CONSULTATION</button>
             </div>
             <div style="display: flex; gap: 5px;">
-                <button class="btn-small" style="color: #a0f;" onclick="cleanAndArchive()">🧹 ARCHIVER</button>
-                <button class="btn-small" style="color: #f44;" onclick="justTrash()">🗑️ JETER</button>
-                <button class="btn-small" style="color: #0ff;" onclick="resetInterface()">🎯 RESET</button>
+                <button class="btn-small" style="color: #a0f;" onclick="cleanAndArchive()" title="Nettoyer et sauvegarder dans les grimoires">🧹 ARCHIVER</button>
+                <button class="btn-small" style="color: #f44;" onclick="justTrash()" title="Effacer la session sans sauvegarder">🗑️ JETER</button>
+                <button class="btn-small" style="color: #0ff;" onclick="resetInterface()" title="Réinitialiser la taille des fenêtres">🎯 RESET</button>
             </div>
             <button id="btnSynthese" onclick="generateSynthese()" style="display:none; background: #600; color: #fff; font-size: 0.8em; padding: 10px; border: 1px solid var(--gold);">🔱 GÉNÉRER LA SYNTHÈSE SUPRÊME</button>
             <button id="btnAuthorizeAll" onclick="authorizeAll()" style="display:none; background: #050; color: #fff; font-size: 0.8em; padding: 10px; border: 1px solid #0f0;">🔱 APPLIQUER LES MODIFICATIONS</button>
@@ -440,8 +440,8 @@
             const btn = document.getElementById('btnSynthese');
             if (btn.disabled) return;
 
-            // Remonter en haut de la grille des réponses en douceur
-            document.getElementById('responsesGrid').scrollTo({ top: 0, behavior: 'smooth' });
+            // Remonter tout en haut de la page en douceur
+            window.scrollTo({ top: 0, behavior: 'smooth' });
 
             // Désactiver le bouton pour éviter les impulsions multiples
             btn.disabled = true;
@@ -499,6 +499,47 @@
             const path = pathMatch ? pathMatch[1] : prompt("Chemin du fichier ?");
             if (path && confirm(`Écraser ${path} ?`)) {
                 await fetch(`${BRIDGE_URL}/apply`, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `path=${encodeURIComponent(path)}&content=${encodeURIComponent(content)}` });
+            }
+        }
+
+        async function cleanAndArchive() {
+            const grid = document.getElementById('responsesGrid');
+            const prompt = document.getElementById('promptInput').value;
+            if (!prompt && grid.innerHTML === "") return;
+
+            const data = {
+                prompt: prompt,
+                responses: Array.from(grid.querySelectorAll('.response-card')).map(c => ({
+                    name: c.querySelector('h3').innerText,
+                    content: c.querySelector('.response-content').innerText
+                }))
+            };
+
+            try {
+                const r = await fetch(`${BRIDGE_URL}/archive`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `content=${encodeURIComponent(JSON.stringify(data, null, 2))}`
+                });
+                if (r.ok) {
+                    alert("🧹 Conversation archivée !");
+                    grid.innerHTML = "";
+                    document.getElementById('promptInput').value = "";
+                    document.getElementById('btnSynthese').style.display = 'none';
+                    fetchArchives();
+                }
+            } catch (e) {
+                alert("Erreur d'archivage.");
+            }
+        }
+
+        function justTrash() {
+            if (confirm("🗑️ Voulez-vous vraiment jeter cette conversation ?")) {
+                document.getElementById('responsesGrid').innerHTML = "";
+                document.getElementById('promptInput').value = "";
+                document.getElementById('geminiInput').value = "";
+                document.getElementById('btnSynthese').style.display = 'none';
+                document.getElementById('btnAuthorizeAll').style.display = 'none';
             }
         }
 
