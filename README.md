@@ -5,7 +5,7 @@
 > * **Liaison Royale (Proxy Bridge)** : Stabilité totale, fini les erreurs CORS.
 > * **Baptême des Héros** : Mémoire persistante des noms adoubés.
 > * **UX Excellence** : Scroll auto et info-bulles sur les actions.
-> * **Mise ajour des IA : Directement depuis leur nom ou générique suivant vos choix
+> * **Mise ajour** des IA : Directement depuis leur nom ou générique suivant vos choix
 
 [Français](#français) | [English](#english) | [Español](#español)
 
