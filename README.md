@@ -18,7 +18,7 @@
 ---
 <p><img width="1852" height="913" alt="image" src="https://github.com/user-attachments/assets/a5f85f36-afe6-4a74-8a96-28848d3cd0cd" /></p>
 ---
-<p></p>
+<p><img width="1853" height="913" alt="image" src="https://github.com/user-attachments/assets/5728b810-9f59-4d42-857c-f3dd893a9a42" /></p>
 ---
 
 <a name="français"></a>
