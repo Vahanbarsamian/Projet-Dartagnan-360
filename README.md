@@ -16,7 +16,7 @@
 > **"Ne demandez plus l'avis d'une IA, exigez celui d'un Conseil d'Experts. Pour le Roi, pour la Science et pour H2C !"** 🇫🇷✨
 
 ---
-<p></p>
+<p><img width="1852" height="913" alt="image" src="https://github.com/user-attachments/assets/a5f85f36-afe6-4a74-8a96-28848d3cd0cd" /></p>
 ---
 <p></p>
 ---
