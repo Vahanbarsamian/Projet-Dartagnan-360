@@ -1,16 +1,15 @@
 # ⚔️ THE MUSKETEER PROTOCOL : DARTAGNAN VISION 360° 🔱
-## *L'Arsenal de l'Ingénierie de Rupture — Version V5.5 "Indestructible"*
+## *L'Arsenal de l'Ingénierie de Rupture — Version V5.6 "Indestructible"*
 
-> **🔧 DERNIÈRE MISE À JOUR : 29 Octobre 2024 - 02:00**
-> * **Relais Royal (Proxy Bridge)** : Plus aucun blocus CORS ou sécurité navigateur.
-> * **Patience du Roi** : Temps de calcul étendu à 10 min pour les calculs de physique lourds.
-> * **Mémoire Éternelle** : Les baptêmes des héros sont désormais définitifs et sauvegardés.
-> * **UX Excellence** : Scroll automatique et sécurité anti-impulsion sur la synthèse.
+> **🔧 DERNIÈRE MISE À JOUR : 29 Octobre 2024 - 01:50**
+> * **Liaison Royale (Proxy Bridge)** : Stabilité totale, fini les erreurs CORS.
+> * **Baptême des Héros** : Mémoire persistante des noms adoubés.
+> * **UX Excellence** : Scroll auto et info-bulles sur les actions.
 
 [Français](#français) | [English](#english) | [Español](#español)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-gold.svg)](https://opensource.org/licenses/MIT)
-[![Version: 5.5](https://img.shields.io/badge/Version-5.5_Indestructible-blue.svg)]()
+[![Version: 5.6](https://img.shields.io/badge/Version-5.6_Indestructible-blue.svg)]()
 [![Status: Opérationnel](https://img.shields.io/badge/Status-Arsenal_Prêt_au_Combat-green.svg)]()
 [![Privacy: 100% Local](https://img.shields.io/badge/Confidentialité-100%25_Souveraine-brightgreen.svg)]()
 
