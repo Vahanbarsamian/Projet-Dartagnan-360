@@ -64,7 +64,7 @@ fun main() {
                         val response: HttpResponse = client.post("http://127.0.0.1:11434/api/chat") { setBody(body) }
                         call.respondText(response.bodyAsText(), ContentType.Application.Json)
                     } catch (e: Exception) {
-                        call.respondText("{\"error\":\"Ollama indisponible\"}", ContentType.Application.Json, HttpStatusCode.ServiceUnavailable)
+                        call.respondText("{\"error\":\"Ollama indisponible : ${e.message}\"}", ContentType.Application.Json, HttpStatusCode.ServiceUnavailable)
                     }
                 }
             }
@@ -119,6 +119,28 @@ fun main() {
                     ?.map { it.name.removePrefix("archive_").removeSuffix(".json") }
                     ?.sortedDescending() ?: emptyList()
                 call.respond(files)
+            }
+
+            get("/archive/{id}") {
+                val id = call.parameters["id"] ?: ""
+                val file = File(archivesDir, "archive_$id.json")
+                if (file.exists()) {
+                    call.respondText(file.readText(), ContentType.Application.Json)
+                } else {
+                    call.respondText("{\"error\":\"Archive introuvable\"}", ContentType.Application.Json, HttpStatusCode.NotFound)
+                }
+            }
+
+            post("/archive/delete") {
+                val params = call.receiveParameters()
+                val id = params["id"] ?: ""
+                val file = File(archivesDir, "archive_$id.json")
+                if (file.exists()) {
+                    withContext(Dispatchers.IO) { file.delete() }
+                    call.respondText("🗑️ Archive supprimée")
+                } else {
+                    call.respondText("❌ Introuvable", status = HttpStatusCode.NotFound)
+                }
             }
 
             post("/forge") {

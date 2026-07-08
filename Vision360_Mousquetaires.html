@@ -26,7 +26,43 @@
             overflow: hidden;
         }
 
-        h1 { color: var(--gold); margin: 0; font-size: 1.2em; font-variant: small-caps; text-align: center; padding-bottom: 5px; border-bottom: 1px solid var(--gold); }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--gold);
+            gap: 20px;
+        }
+
+        .header-info {
+            font-family: 'Copperplate', 'Copperplate Gothic Light', serif;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: var(--gold);
+            min-width: 180px;
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #searchBar {
+            background: #000;
+            border: 1px solid #444;
+            color: var(--gold);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            width: 200px;
+            outline: none;
+            transition: 0.3s;
+        }
+        #searchBar:focus { border-color: var(--gold); box-shadow: 0 0 5px var(--gold); }
+        .highlight { background-color: #080; color: #fff; padding: 0 2px; border-radius: 2px; }
+
+        h1 { color: var(--gold); margin: 0; font-size: 1.2em; font-variant: small-caps; text-align: center; flex: 1; }
 
         .config-bar {
             background: var(--card-bg);
@@ -75,8 +111,19 @@
         }
 
         .input-area { width: 340px; display: flex; flex-direction: column; gap: 8px; }
-        .responses-grid { flex: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 10px; overflow-y: auto; padding-right: 5px; }
+        .responses-grid { flex: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 10px; overflow-y: auto; padding-right: 5px; scroll-behavior: smooth; }
         .right-panel { width: 240px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
+
+        .archive-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px;
+            border-bottom: 1px solid #222;
+            cursor: pointer;
+        }
+        .archive-item:hover { background: rgba(255, 215, 0, 0.05); }
+        .archive-id { flex: 1; }
 
         textarea { background: #000; color: #fff; border: 1px solid var(--border); padding: 10px; border-radius: 4px; font-family: monospace; font-size: 0.85em; resize: both; }
         #promptInput { height: 120px; min-width: 100%; }
@@ -113,19 +160,57 @@
         .close-modal { position: absolute; right: 20px; top: 10px; font-size: 2em; color: var(--gold); cursor: pointer; }
 
         ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
         .mermaid { background: white !important; color: black; border-radius: 4px; margin-top: 10px; }
+
+        #backToTop {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10000;
+            background: var(--gold);
+            color: black;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        #whoIsTalking {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0, 191, 255, 0.05);
+            border: 1px solid #00bfff;
+            border-radius: 4px;
+            font-size: 0.8em;
+            color: #00bfff;
+            text-align: center;
+            font-family: monospace;
+            display: none;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
 </head>
 <body>
 
-    <h1>⚔️ Conseil Scientifique des Mousquetaires : Pour le Roi et la France ⚔️</h1>
+    <div class="header-container">
+        <div id="headerDate" class="header-info"></div>
+        <h1>⚔️ Conseil Scientifique des Mousquetaires : Pour le Roi et la France ⚔️</h1>
+        <div class="header-info" style="justify-content: flex-end;">
+            <input type="text" id="searchBar" placeholder="🔍 Rechercher dans le conseil..." oninput="searchInResponses()">
+            <div id="headerTime" style="margin-left: 15px;"></div>
+        </div>
+    </div>
 
     <div class="config-bar">
         <button id="btnLaunch" onclick="startAllSystems()">🚀 LANCER LE SYSTÈME</button>
         <div id="systemTicker">Initialisation requise...</div>
+        <button id="btnToggleAll" class="btn-small" style="font-size: 0.6em; padding: 2px 5px; width: auto; height: fit-content; border-color: var(--gold); color: var(--gold);" onclick="toggleAllModels()" title="Tout cocher / décocher">✅/❌</button>
         <div id="modelList" class="mousquetaires-list"></div>
     </div>
 
@@ -162,6 +247,7 @@
             </div>
             <button id="btnSynthese" onclick="generateSynthese()" style="display:none; background: #600; color: #fff; font-size: 0.8em; padding: 10px; border: 1px solid var(--gold);">🔱 GÉNÉRER LA SYNTHÈSE SUPRÊME</button>
             <button id="btnAuthorizeAll" onclick="authorizeAll()" style="display:none; background: #050; color: #fff; font-size: 0.8em; padding: 10px; border: 1px solid #0f0;">🔱 APPLIQUER LES MODIFICATIONS</button>
+            <div id="whoIsTalking"></div>
             <div id="globalLoader" style="display:none; font-size: 0.7em; color: var(--gold); text-align: center; font-style: italic;">Consultation en cours...</div>
         </div>
 
@@ -196,6 +282,8 @@
             <div id="modalBody" class="response-content"></div>
         </div>
     </div>
+
+    <button id="backToTop" onclick="scrollToTop()" title="Remonter en haut">↑</button>
 
     <script>
         const BRIDGE_URL = 'http://127.0.0.1:8081';
@@ -237,8 +325,12 @@
         const epicNames = ["Planchet", "Grimaud", "Mousqueton", "Bazin", "Milady", "Rochefort", "Constance", "Lord Winter", "Felton", "Jussac", "Cahusac", "Bernajoux", "Mme de Chevreuse"];
         let availableModels = [];
         let currentImageData = null;
+        let abortController = null;
 
         async function startAllSystems() {
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+
             const btn = document.getElementById('btnLaunch');
             const ticker = document.getElementById('systemTicker');
             const log = (msg, status, color = "#888") => ticker.innerHTML = `CMD: ${msg} | STATUT: <span style="color:${color}">${status}</span>`;
@@ -272,10 +364,18 @@
 
             await fetchModels();
             await fetchArchives();
-            ticker.innerHTML = "<b style='color:#0f0'>✨ ARSENAL OPÉRATIONNEL ✨</b>";
+            ticker.innerHTML = "<b style='color:#0f0'>✨ ARSENAL V7.0 : TRIBUNAL DE LA RAISON OPÉRATIONNEL ✨</b>";
             btn.innerText = "🔱 SYSTÈME ACTIF";
             btn.style.background = "#050";
             btn.disabled = false;
+        }
+
+        function updateDateTime() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const timeStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById('headerDate').innerText = `📅 ${dateStr}`;
+            document.getElementById('headerTime').innerText = `🕒 ${timeStr}`;
         }
 
         async function fetchModels() {
@@ -389,6 +489,12 @@
             }
         }
 
+        function toggleAllModels() {
+            const checkboxes = document.querySelectorAll('#modelList input[type="checkbox"]');
+            const anyUnchecked = Array.from(checkboxes).some(cb => !cb.checked);
+            checkboxes.forEach(cb => cb.checked = anyUnchecked);
+        }
+
         function toggleAskButton() {
             const prompt = document.getElementById('promptInput').value.trim();
             const btn = document.getElementById('btnAskAll');
@@ -413,55 +519,199 @@
         }
 
         async function askAll() {
+            const btn = document.getElementById('btnAskAll');
+
+            if (abortController) {
+                abortController.abort();
+                stopConsultationUI();
+                return;
+            }
+
             const prompt = document.getElementById('promptInput').value;
             if (!prompt) return;
+
+            abortController = new AbortController();
+            btn.innerHTML = "🛑 STOPPER LA CONSULTATION";
+            btn.classList.remove('btn-gold');
+            btn.style.background = "#f44";
+
             const selected = document.querySelectorAll('#modelList input:checked');
             const grid = document.getElementById('responsesGrid');
             grid.innerHTML = '';
-            document.getElementById('globalLoader').style.display = 'block';
-            let context = "";
-            for (let cb of selected) {
-                const model = cb.getAttribute('data-model');
-                const nick = mapping[model] || model;
-                const res = await askOneWithCritique(model, nick, prompt, context);
-                context += `\n[${nick}]: ${res}\n`;
+
+            const toggleBtn = document.getElementById('btnToggleAll');
+            if (toggleBtn) {
+                toggleBtn.disabled = true;
+                toggleBtn.style.opacity = "0.3";
+                toggleBtn.style.cursor = "not-allowed";
             }
-            document.getElementById('globalLoader').style.display = 'none';
-        }
 
-        async function askOneWithCritique(model, nickname, userPrompt, context) {
-            const grid = document.getElementById('responsesGrid');
-            const card = document.createElement('div');
-            card.className = 'response-card';
-            const cardId = `res-${model.replace(':','-')}`;
-            const swordId = `sword-${model.replace(':','-')}`;
-            card.innerHTML = `<h3><div class="sword-container" id="${swordId}"><svg class="sword-svg" viewBox="0 0 20 100"><path class="blade" d="M10 5 L13 85 L7 85 Z" /><rect class="guard" x="3" y="85" width="14" height="4" rx="2" /><rect class="hilt" x="8" y="89" width="4" height="8" fill="#5D2906" /><circle class="pommel" cx="10" cy="98" r="2" /></svg></div>${nickname}<div class="action-btns"><button class="act-btn" title="Plein écran" onclick="openFullScreen('${nickname}', '${cardId}')">⛶</button><button class="act-btn" title="Copier dans le presse-papier" onclick="copyToClipboard('${cardId}')">📋</button><button class="act-btn" title="Appliquer au projet" onclick="applyToProject('${cardId}')">🚀</button></div></h3><div class="response-content" id="${cardId}">Réflexion...</div>`;
-            grid.appendChild(card);
-            const sword = document.getElementById(swordId);
-            sword.classList.add('state-received');
-            const myRole = roles[model] || 'EXPERT SCIENTIFIQUE';
-            const systemMsg = `Tu es ${nickname}, expert ${myRole}. 1. Si H2C est présenté, respecte sa physique. 2. Pour toute question générale, apporte l'état de l'art. 3. Pas de dénigrement. Réponds en Français.`;
-            const payload = { model: model, messages: [{ role: 'system', content: systemMsg }, { role: 'user', content: (context ? `Contexte: ${context}\n\n` : "") + userPrompt }], stream: false, options: { num_ctx: 4096, temperature: 0.7 }};
-            if (currentImageData) payload.images = [currentImageData];
+            const loader = document.getElementById('globalLoader');
+            loader.style.display = 'block';
+
+            const matrix = { exposition: {}, critique: {} };
+            const models = Array.from(selected).map(cb => ({
+                id: cb.getAttribute('data-model'),
+                nick: mapping[cb.getAttribute('data-model')] || cb.getAttribute('data-model')
+            }));
+
+            const talkIndicator = document.getElementById('whoIsTalking');
+            talkIndicator.style.display = 'block';
+
+            let rollingContext = "";
+
             try {
-                sword.classList.remove('state-received'); sword.classList.add('state-thinking');
-                const r = await fetch(`${BRIDGE_URL}/ollama/chat`, { method: 'POST', body: JSON.stringify(payload) });
-                const data = await r.json();
-
-                if (data.error) {
-                    throw new Error(data.error);
+                // PHASE 1 : LE RELAIS DES MOUSQUETAIRES (Chaine de pensée séquentielle)
+                loader.innerHTML = "⚔️ PHASE I : LE RELAIS DES MOUSQUETAIRES...";
+                let prevNick = "Mousquetaire du Roi";
+                for (let m of models) {
+                    talkIndicator.innerHTML = `📡 ${prevNick} ➔ ${m.nick}`;
+                    const res = await askOne(m.id, m.nick, prompt, rollingContext, "relais", abortController.signal);
+                    matrix.exposition[m.nick] = res;
+                    rollingContext += `\n--- AVIS DE ${m.nick} ---\n${res}\n\n`;
+                    prevNick = m.nick;
                 }
 
-                const content = data.message.content;
-                document.getElementById(cardId).innerHTML = marked.parse(content);
-                sword.classList.remove('state-thinking'); sword.classList.add('state-done');
+                // PHASE 2 : LE DROIT DE RÉPONSE (Confrontation globale)
+                if (models.length > 1) {
+                    loader.innerHTML = "⚖️ PHASE II : DROIT DE RÉPONSE & CONFRONTATION...";
+                    talkIndicator.innerHTML = `⚖️ TRIBUNAL DE LA RAISON`;
+                    for (let m of models) {
+                        const feedback = await askOne(m.id, m.nick, prompt, rollingContext, "confrontation", abortController.signal);
+                        matrix.critique[m.nick] = feedback;
+                    }
+                }
+            } catch (e) {
+                if (e.name === 'AbortError') {
+                    console.log("Consultation stoppée par l'utilisateur.");
+                } else {
+                    console.error("Erreur consultation:", e);
+                }
+            } finally {
+                stopConsultationUI();
+            }
+        }
+
+        function stopConsultationUI() {
+            const btn = document.getElementById('btnAskAll');
+            btn.innerHTML = "LANCER LA CONSULTATION";
+            btn.classList.add('btn-gold');
+            btn.style.background = "";
+
+            document.getElementById('globalLoader').style.display = 'none';
+            document.getElementById('whoIsTalking').style.display = 'none';
+
+            const toggleBtn = document.getElementById('btnToggleAll');
+            if (toggleBtn) {
+                toggleBtn.disabled = false;
+                toggleBtn.style.opacity = "1";
+                toggleBtn.style.cursor = "pointer";
+            }
+
+            if (document.getElementById('responsesGrid').innerHTML !== "") {
                 document.getElementById('btnSynthese').style.display = 'block';
+            }
+
+            abortController = null;
+        }
+
+        async function askOne(model, nickname, userPrompt, context, phase, signal) {
+            const grid = document.getElementById('responsesGrid');
+            const safeModelId = model.replace(/[:.]/g, '-');
+            const cardId = `res-${safeModelId}`;
+            const swordId = `sword-${safeModelId}`;
+
+            let card = document.getElementById(`card-${cardId}`);
+            if (!card) {
+                card = document.createElement('div');
+                card.className = 'response-card';
+                card.id = `card-${cardId}`;
+                card.innerHTML = `<h3><div class="sword-container" id="${swordId}"><svg class="sword-svg" viewBox="0 0 20 100"><path class="blade" d="M10 5 L13 85 L7 85 Z" /><rect class="guard" x="3" y="85" width="14" height="4" rx="2" /><rect class="hilt" x="8" y="89" width="4" height="8" fill="#5D2906" /><circle class="pommel" cx="10" cy="98" r="2" /></svg></div>${nickname}<div class="action-btns"><button class="act-btn" title="Relancer la réflexion" onclick="retryOne('${cardId}')">🔄</button><button class="act-btn" title="Plein écran" onclick="openFullScreen('${nickname}', '${cardId}')">⛶</button><button class="act-btn" title="Copier dans le presse-papier" onclick="copyToClipboard('${cardId}')">📋</button><button class="act-btn" title="Appliquer au projet" onclick="applyToProject('${cardId}')">🚀</button></div></h3><div class="response-content" id="${cardId}">Réflexion...</div><button class="btn-small" style="margin-top:5px; font-size:0.6em; border-color:#555;" onclick="translateToFrench('${cardId}')">🇫🇷 Traduire</button>`;
+                grid.appendChild(card);
+            }
+
+            // Mémorisation des paramètres pour une éventuelle relance
+            card.dataset.model = model;
+            card.dataset.nickname = nickname;
+            card.dataset.userPrompt = userPrompt;
+            card.dataset.context = context;
+            card.dataset.phase = phase;
+
+            const responseArea = document.getElementById(cardId);
+            const sword = document.getElementById(swordId);
+
+            sword.className = 'sword-container state-received';
+
+            const myRole = roles[model] || roles[model.split(':')[0] + ':latest'] || 'EXPERT SCIENTIFIQUE';
+            let systemMsg = "";
+            let finalPrompt = "";
+
+            if (phase === "relais") {
+                systemMsg = `Tu es ${nickname}, expert ${myRole}. Tu participes à un conseil restreint.
+                Prends connaissance de la question et des avis de tes confrères déjà exprimés.
+                Apporte ta propre expertise en complétant ou en nuançant les propos précédents.
+                Respecte la physique du H2C si mentionnée. Réponds en Français.`;
+                finalPrompt = (context ? "DÉBUT DU CONSEIL :\n" + context + "\n" : "") + "QUESTION : " + userPrompt;
+            } else if (phase === "confrontation") {
+                systemMsg = `Tu es ${nickname}, expert ${myRole}. Le tour de table est fini.
+                Voici l'intégralité des débats. Certains confrères ont parlé après toi ou ont pu contredire tes propos.
+                Défends ta position, valide les bonnes idées apparues ou rectifie tes erreurs si les preuves sont solides.
+                Sois incisif et va à l'essentiel. Pas de politesse superflue.`;
+                finalPrompt = "TRANSCRIPT COMPLET DES ÉCHANGES :\n" + context + "\n\nTA RÉACTION FINALE :";
+            }
+
+            const payload = {
+                model: model,
+                messages: [
+                    { role: 'system', content: systemMsg },
+                    { role: 'user', content: finalPrompt }
+                ],
+                stream: false,
+                options: { num_ctx: 12288, temperature: 0.6 }
+            };
+
+            if (currentImageData && phase === "relais") payload.images = [currentImageData];
+
+            try {
+                sword.className = 'sword-container state-thinking';
+                const r = await fetch(`${BRIDGE_URL}/ollama/chat`, {
+                    method: 'POST',
+                    body: JSON.stringify(payload),
+                    signal: signal
+                });
+                const data = await r.json();
+
+                if (data.error) throw new Error(data.error);
+
+                const content = data.message.content;
+                const htmlContent = marked.parse(content);
+
+                if (phase === "relais") {
+                    responseArea.innerHTML = htmlContent;
+                } else {
+                    // Pour la confrontation, on vérifie si c'est une relance pour ne pas dupliquer le bloc
+                    const existingCritique = responseArea.querySelector('.critique-block');
+                    const critiqueHtml = `<div class="critique-block" style="margin-top:15px; border-top: 1px dashed var(--gold); padding-top:10px; background: rgba(0, 191, 255, 0.02);">
+                        <span style="color:#00bfff; font-size:0.8em; font-weight:bold;">⚖️ RÉACTION & DROIT DE RÉPONSE :</span><br>${htmlContent}
+                    </div>`;
+
+                    if (existingCritique) {
+                        existingCritique.outerHTML = critiqueHtml;
+                    } else {
+                        responseArea.innerHTML += critiqueHtml;
+                    }
+                }
+
+                sword.className = 'sword-container state-done';
                 return content;
             } catch (e) {
-                document.getElementById(cardId).innerHTML = `<span style="color:#f44;">❌ ${e.message || "Erreur de calcul"}</span><br><small style="opacity:0.5;">(Modèle trop lourd pour le GPU ?)</small>`;
+                if (e.name === 'AbortError') {
+                    responseArea.innerHTML += `<br><span style="color:#fa0;">🛑 Consultation interrompue par le commandement.</span>`;
+                } else {
+                    responseArea.innerHTML += `<br><span style="color:#f44;">❌ Erreur (${phase}): ${e.message}</span>`;
+                }
                 sword.style.opacity = "0.3";
-                document.getElementById('btnSynthese').style.display = 'block';
-                return "";
+                throw e; // Propager pour arrêter la boucle askAll
             }
         }
 
@@ -471,6 +721,24 @@
             document.getElementById('fullScreenModal').style.display = "block";
         }
         function closeFullScreen() { document.getElementById('fullScreenModal').style.display = "none"; }
+
+        async function retryOne(cardId) {
+            const card = document.getElementById(`card-${cardId}`);
+            if (!card) return;
+
+            const model = card.dataset.model;
+            const nickname = card.dataset.nickname;
+            const userPrompt = card.dataset.userPrompt;
+            const context = card.dataset.context;
+            const phase = card.dataset.phase;
+
+            try {
+                await askOne(model, nickname, userPrompt, context, phase, null);
+            } catch (e) {
+                console.error("Erreur lors de la relance :", e);
+            }
+        }
+
         function resetInterface() {
             const pi = document.getElementById('promptInput'); const gi = document.getElementById('geminiInput');
             pi.style.width = '100%'; pi.style.height = '120px'; gi.style.width = '100%'; gi.style.height = '60px';
@@ -493,11 +761,30 @@
                 const ids = await r.json();
                 container.innerHTML = ids.length ? "" : "Aucune archive.";
                 ids.forEach(id => {
-                    const div = document.createElement('div'); div.className = 'archive-item';
-                    div.innerText = `#${id}`; div.onclick = () => recallArchive(id);
+                    const div = document.createElement('div');
+                    div.className = 'archive-item';
+                    div.innerHTML = `<span class="archive-id" onclick="recallArchive('${id}')">📖 #${id}</span>
+                                     <button class="act-btn" style="color:#0bf; border-color:#045;" onclick="document.getElementById('archiveIndex').value='${id}'" title="Préparer l'index">📌</button>
+                                     <button class="act-btn" style="color:#f44; border-color:#422;" onclick="deleteArchive('${id}')" title="Supprimer">🗑️</button>`;
                     container.appendChild(div);
                 });
             } catch (e) {}
+        }
+
+        async function deleteArchive(id) {
+            if (!confirm(`🛡️ Supprimer définitivement l'archive #${id} ?`)) return;
+            try {
+                const r = await fetch(`${BRIDGE_URL}/archive/delete`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `id=${encodeURIComponent(id)}`
+                });
+                if (r.ok) {
+                    fetchArchives();
+                }
+            } catch (e) {
+                alert("Erreur lors de la suppression.");
+            }
         }
 
         async function recallArchive(id) {
@@ -506,9 +793,27 @@
             try {
                 const r = await fetch(`${BRIDGE_URL}/archive/${rid}`);
                 const d = await r.json();
-                document.getElementById('promptInput').value = `[ARCHIVE #${rid}]\n${d.prompt}`;
+                document.getElementById('promptInput').value = d.prompt;
+
+                const grid = document.getElementById('responsesGrid');
+                grid.innerHTML = '';
+
+                if (d.responses) {
+                    d.responses.forEach(resp => {
+                        const card = document.createElement('div');
+                        card.className = 'response-card';
+                        card.innerHTML = `<h3><div class="sword-container state-done"><svg class="sword-svg" viewBox="0 0 20 100"><path class="blade" d="M10 5 L13 85 L7 85 Z" style="fill: #FFF; filter: drop-shadow(0 0 10px var(--gold));" /><rect class="guard" x="3" y="85" width="14" height="4" rx="2" fill="#444" /><rect class="hilt" x="8" y="89" width="4" height="8" fill="#5D2906" /><circle class="pommel" cx="10" cy="98" r="2" fill="#111" /></svg></div>${resp.name} [ARCHIVE]</h3><div class="response-content">${resp.content}</div>`;
+                        grid.appendChild(card);
+                    });
+                }
+
                 toggleAskButton();
-            } catch(e) {}
+                if (grid.innerHTML !== "") {
+                    document.getElementById('btnSynthese').style.display = 'block';
+                }
+            } catch(e) {
+                console.error("Erreur lors du rappel de l'archive:", e);
+            }
         }
 
         function copyToClipboard(id) { navigator.clipboard.writeText(document.getElementById(id).innerText); alert("Copié !"); }
@@ -530,43 +835,89 @@
             const btn = document.getElementById('btnSynthese');
             if (btn.disabled) return;
 
-            // Remonter tout en haut de la page en douceur
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Propulsion immédiate en haut de page pour voir le verdict
+            scrollToTop();
 
-            // Désactiver le bouton pour éviter les impulsions multiples
+            // Sécurité : S'assurer que le Cardinal (Codestral) est bien coché dans la liste s'il existe
+            const cardinalCheckbox = document.querySelector('input[data-model="codestral:latest"]');
+            if (cardinalCheckbox && !cardinalCheckbox.checked) {
+                cardinalCheckbox.checked = true;
+            }
+
             btn.disabled = true;
-            btn.innerText = "⏳ LE CARDINAL ANALYSE...";
+            btn.innerText = "⏳ LE CARDINAL TRANCHE...";
             btn.style.opacity = "0.5";
 
             const grid = document.getElementById('responsesGrid');
             const cards = grid.querySelectorAll('.response-card');
             let all = "";
             cards.forEach(c => {
+                const title = c.querySelector('h3').innerText;
                 const content = c.querySelector('.response-content').innerText;
-                if (!content.includes("❌")) { // On n'inclut pas les erreurs dans la synthèse
-                    all += `--- ${c.querySelector('h3').innerText} ---\n${content}\n\n`;
+                if (!content.includes("❌") && !title.includes("SYNTHÈSE")) {
+                    all += `--- DÉBATS DE ${title} ---\n${content}\n\n`;
                 }
             });
             const gem = document.getElementById('geminiInput').value;
-            if(gem) all += `--- DUC DE BUCKINGHAM ---\n${gem}\n\n`;
-            const card = document.createElement('div'); card.className = 'response-card'; card.style.gridColumn = "1 / -1";
-            card.innerHTML = `<h3 style="color:#f40">🔱 SYNTHÈSE DU CARDINAL</h3><div class="response-content" id="res-syn">Analyse...</div>`;
-            grid.prepend(card);
-            const prompt = `Tu es le Cardinal de Richelieu. Fais une synthèse CRITIQUE. Focus: H2C / Triboélectricité. Rapports:\n${all}`;
+            if(gem) all += `--- EXPERTISE DU DUC DE BUCKINGHAM (GEMINI) ---\n${gem}\n\n`;
+
+            let synCard = document.getElementById('card-res-syn');
+            if (!synCard) {
+                synCard = document.createElement('div');
+                synCard.className = 'response-card';
+                synCard.id = 'card-res-syn';
+                synCard.style.gridColumn = "1 / -1";
+                synCard.style.border = "2px solid #f40";
+                grid.prepend(synCard);
+            }
+
+            synCard.innerHTML = `<h3 style="color:#f40">🔱 SYNTHÈSE SUPRÊME DU CARDINAL DE RICHELIEU</h3><div class="response-content" id="res-syn">Le Cardinal examine les débats et les réfutations...</div>`;
+
+            // CONSEIL DE TRÉVILLE : Vérifier si le Cardinal (Codestral) est présent dans l'arsenal
+            const cardinalModel = 'codestral:latest';
+            const isCardinalReady = availableModels.some(m => m.name === cardinalModel);
+
+            if (!isCardinalReady) {
+                document.getElementById('res-syn').innerHTML = `<span style="color:#fa0;">⚠️ LE CARDINAL N'EST PAS DANS L'ARSENAL.</span><br>M. de Tréville suggère de recruter 'codestral:latest' via le bouton 🔄 dans la liste des modèles avant de solliciter le Cardinal.`;
+                btn.disabled = false;
+                btn.innerText = "🔱 RAPPELER LE CARDINAL";
+                btn.style.opacity = "1";
+                return;
+            }
+
+            const prompt = `Tu es le Cardinal de Richelieu, Grand Maître de la Raison d'État.
+            Devant toi se sont affrontés les plus grands esprits (Expositions et Réfutations).
+            TA MISSION :
+            1. Analyse le débat. Qui a apporté la preuve la plus solide ? Qui a été réfuté avec raison ?
+            2. Tranche de manière définitive.
+            3. Si des modifications de code sont nécessaires, fournis-les au format // PATH: chemin/vers/fichier
+            4. Utilise un ton impérieux, politique et scientifique.
+
+            DÉBATS DU CONSEIL :
+            ${all}`;
+
             try {
-                const r = await fetch(`${BRIDGE_URL}/ollama/chat`, { method: 'POST', body: JSON.stringify({ model: 'codestral:latest', messages: [{role:'user', content:prompt}], stream: false }) });
+                const r = await fetch(`${BRIDGE_URL}/ollama/chat`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        model: 'codestral:latest',
+                        messages: [{role:'system', content: 'Tu es le Cardinal de Richelieu. Tu tranches les débats techniques avec autorité.'}, {role:'user', content:prompt}],
+                        stream: false,
+                        options: { num_ctx: 32768, temperature: 0.4 }
+                    })
+                });
                 const d = await r.json();
+                if (d.error) throw new Error(d.error);
                 document.getElementById('res-syn').innerHTML = marked.parse(d.message.content);
                 document.getElementById('btnAuthorizeAll').style.display = 'block';
 
-                // On réactive le bouton une fois fini (optionnel, pour permettre une nouvelle synthèse)
                 btn.disabled = false;
-                btn.innerText = "🔱 GÉNÉRER UNE NOUVELLE SYNTHÈSE";
+                btn.innerText = "🔱 RÉACTUALISER LA SYNTHÈSE";
                 btn.style.opacity = "1";
             } catch(e) {
-                document.getElementById('res-syn').innerText = "Erreur.";
+                document.getElementById('res-syn').innerHTML = `<span style="color:#f44;">❌ Le Cardinal est indisposé : ${e.message}</span><br><br>💡 <i>Vérifiez que le Pont Royal est actif et que le modèle 'codestral:latest' est bien installé.</i>`;
                 btn.disabled = false;
-                btn.innerText = "🔱 RÉESSAYER LA SYNTHÈSE";
+                btn.innerText = "🔱 RAPPELER LE CARDINAL";
             }
         }
 
@@ -599,10 +950,16 @@
 
             const data = {
                 prompt: prompt,
-                responses: Array.from(grid.querySelectorAll('.response-card')).map(c => ({
-                    name: c.querySelector('h3').innerText,
-                    content: c.querySelector('.response-content').innerText
-                }))
+                responses: Array.from(grid.querySelectorAll('.response-card')).map(c => {
+                    const h3 = c.querySelector('h3').cloneNode(true);
+                    const actionBtns = h3.querySelector('.action-btns');
+                    if (actionBtns) actionBtns.remove();
+
+                    return {
+                        name: h3.innerText.trim(),
+                        content: c.querySelector('.response-content').innerHTML
+                    };
+                })
             };
 
             try {
@@ -634,6 +991,93 @@
                 toggleAskButton();
             }
         }
+
+        async function translateToFrench(id) {
+            const el = document.getElementById(id);
+            const originalText = el.innerText;
+            el.innerHTML += `<div style="font-size:0.7em; color:var(--gold); margin-top:10px; border-top:1px solid #333; padding-top:5px;">⏳ Traduction en cours...</div>`;
+
+            try {
+                const r = await fetch(`${BRIDGE_URL}/ollama/chat`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        model: 'mistral:latest',
+                        messages: [
+                            { role: 'system', content: 'Tu es un traducteur expert. Traduis le texte suivant en français technique. Ne renvoie QUE la traduction, sans aucun commentaire.' },
+                            { role: 'user', content: originalText }
+                        ],
+                        stream: false
+                    })
+                });
+                const d = await r.json();
+                el.innerHTML += `<div style="margin-top:10px; padding:8px; background:rgba(255,255,255,0.03); border-left:2px solid var(--gold); font-style:italic;">${marked.parse(d.message.content)}</div>`;
+            } catch(e) {
+                alert("Erreur de traduction : " + e.message);
+            }
+        }
+
+        function searchInResponses() {
+            const query = document.getElementById('searchBar').value.trim();
+            const contents = document.querySelectorAll('.response-content');
+
+            contents.forEach(el => {
+                // Supprimer les surbrillances existantes sans perdre le contenu HTML
+                // On utilise une approche simple : on réinitialise l'élément et on marque
+                // Note: Cela peut être lourd si on le fait en temps réel sur de gros textes.
+                // Pour une version plus propre, on sauvegarde le contenu original.
+                if (!el.getAttribute('data-original')) {
+                    el.setAttribute('data-original', el.innerHTML);
+                }
+                let originalHTML = el.getAttribute('data-original');
+
+                if (query.length < 2) {
+                    el.innerHTML = originalHTML;
+                    return;
+                }
+
+                // Regex pour trouver le texte hors des balises HTML
+                const regex = new RegExp(`(${query.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi');
+                // On ne remplace que dans les nœuds de texte pour ne pas casser le HTML
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = originalHTML;
+
+                const walk = document.createTreeWalker(tempDiv, NodeFilter.SHOW_TEXT, null, false);
+                let node;
+                const nodesToReplace = [];
+                while(node = walk.nextNode()) {
+                    if (node.nodeValue.toLowerCase().includes(query.toLowerCase())) {
+                        nodesToReplace.push(node);
+                    }
+                }
+
+                nodesToReplace.forEach(textNode => {
+                    const span = document.createElement('span');
+                    span.innerHTML = textNode.nodeValue.replace(regex, '<span class="highlight">$1</span>');
+                    textNode.parentNode.replaceChild(span, textNode);
+                });
+
+                el.innerHTML = tempDiv.innerHTML;
+            });
+        }
+
+        function scrollToTop() {
+            document.getElementById('responsesGrid').scrollTo({top: 0, behavior: 'smooth'});
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        // Gestion de la visibilité du bouton de remontée
+        const handleScroll = () => {
+            const btn = document.getElementById("backToTop");
+            const grid = document.getElementById('responsesGrid');
+            if (grid.scrollTop > 300 || window.scrollY > 300) {
+                btn.style.display = "block";
+            } else {
+                btn.style.display = "none";
+            }
+        };
+
+        document.getElementById('responsesGrid').addEventListener('scroll', handleScroll);
+        window.addEventListener('scroll', handleScroll);
 
         mermaid.initialize({ startOnLoad: false, theme: 'dark' });
     </script>
