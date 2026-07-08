@@ -1,5 +1,5 @@
 # ⚔️ THE MUSKETEER PROTOCOL : DARTAGNAN VISION 360° 🔱
-## *L'Arsenal de l'Ingénierie de Rupture — Version V6.2 "Indestructible"*
+## *L'Arsenal de l'Ingénierie de Rupture — Version V8.4 "Indestructible"*
 
 > **🔧 DERNIÈRE MISE À JOUR : 07 Juillet 2026 - 20:40 H**
 > * **Liaison Royale (Proxy Bridge)** : Stabilité totale, fini les erreurs CORS.
@@ -23,7 +23,7 @@
 ---
 
 <a name="français"></a>
-## 🇫🇷 NOTICE UNIVERSELLE D'UTILISATION (V6.2)
+## 🇫🇷 NOTICE UNIVERSELLE D'UTILISATION (V8.4)
 
 ### 🎯 POUR QUI ?
 *   **INGÉNIEURS & SCIENTIFIQUES** : Pour valider des concepts de rupture (H2C) sans fuite de données.
@@ -62,7 +62,7 @@
 ---
 
 <a name="english"></a>
-## 🇺🇸 UNIVERSAL USER GUIDE (V6.2)
+## 🇺🇸 UNIVERSAL USER GUIDE (V8.4)
 
 ### 🎯 TARGET AUDIENCE
 *   **ENGINEERS & SCIENTISTS**: Validate breakthrough concepts (H2C) without data leaks.
@@ -80,7 +80,7 @@
 ---
 
 <a name="español"></a>
-## 🇪🇸 GUÍA UNIVERSAL DE USO (V6.2)
+## 🇪🇸 GUÍA UNIVERSAL DE USO (V8.4)
 
 ### 🎯 ¿PARA QUIÉN?
 *   **INGENIEROS Y CIENTÍFICOS**: Validar conceptos de ruptura (H2C) sin fugas de datos.
