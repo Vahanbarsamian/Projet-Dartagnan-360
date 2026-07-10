@@ -326,6 +326,7 @@
         let availableModels = [];
         let currentImageData = null;
         let abortController = null;
+        let globalSessionHistory = "";
 
         async function startAllSystems() {
             updateDateTime();
@@ -518,7 +519,7 @@
             }
         }
 
-        async function askAll() {
+        async function askAll(isFollowUp = false) {
             const btn = document.getElementById('btnAskAll');
 
             if (abortController) {
@@ -527,8 +528,20 @@
                 return;
             }
 
-            const prompt = document.getElementById('promptInput').value;
-            if (!prompt) return;
+            let prompt = "";
+            if (isFollowUp) {
+                prompt = document.getElementById('followUpInput').value.trim();
+                if (!prompt) return;
+                // On ajoute la question de l'utilisateur à l'historique
+                globalSessionHistory += `\n\n### 👤 RÉPLIQUE DU COMMANDEMENT :\n${prompt}\n\n`;
+            } else {
+                prompt = document.getElementById('promptInput').value.trim();
+                if (!prompt) return;
+                // Nouvelle session : on réinitialise l'historique
+                globalSessionHistory = `### ❓ PROBLÉMATIQUE INITIALE :\n${prompt}\n\n`;
+                const grid = document.getElementById('responsesGrid');
+                grid.innerHTML = '';
+            }
 
             abortController = new AbortController();
             btn.innerHTML = "🛑 STOPPER LA CONSULTATION";
@@ -536,8 +549,6 @@
             btn.style.background = "#f44";
 
             const selected = document.querySelectorAll('#modelList input:checked');
-            const grid = document.getElementById('responsesGrid');
-            grid.innerHTML = '';
 
             const toggleBtn = document.getElementById('btnToggleAll');
             if (toggleBtn) {
@@ -558,7 +569,7 @@
             const talkIndicator = document.getElementById('whoIsTalking');
             talkIndicator.style.display = 'block';
 
-            let rollingContext = "";
+            let rollingContext = globalSessionHistory;
 
             try {
                 // PHASE 1 : LE RELAIS DES MOUSQUETAIRES (Chaine de pensée séquentielle)
@@ -581,6 +592,10 @@
                         matrix.critique[m.nick] = feedback;
                     }
                 }
+
+                // On met à jour l'historique global pour la suite
+                globalSessionHistory = rollingContext;
+
             } catch (e) {
                 if (e.name === 'AbortError') {
                     console.log("Consultation stoppée par l'utilisateur.");
@@ -589,7 +604,32 @@
                 }
             } finally {
                 stopConsultationUI();
+                renderFollowUpCard();
             }
+        }
+
+        function renderFollowUpCard() {
+            const grid = document.getElementById('responsesGrid');
+            // Supprimer l'ancienne carte de réplique si elle existe
+            const oldCard = document.getElementById('userReplyCard');
+            if (oldCard) oldCard.remove();
+
+            const card = document.createElement('div');
+            card.className = 'response-card';
+            card.id = 'userReplyCard';
+            card.style.gridColumn = "1 / -1";
+            card.style.border = "1px solid #00bfff";
+            card.style.background = "rgba(0, 191, 255, 0.05)";
+            card.innerHTML = `
+                <h3 style="color:#00bfff">👤 VOTRE RÉPONSE AU CONSEIL</h3>
+                <div class="response-content">
+                    <textarea id="followUpInput" placeholder="Rebondissez sur un argument, demandez une précision ou contestez un point..." style="width:100%; height:80px; margin-bottom:10px;"></textarea>
+                    <button class="btn-small btn-gold" style="width:100%;" onclick="askAll(true)">🚀 RENVOYER AU CONSEIL</button>
+                </div>
+            `;
+            grid.appendChild(card);
+            // Scroll to the reply card
+            card.scrollIntoView({ behavior: 'smooth' });
         }
 
         function stopConsultationUI() {
