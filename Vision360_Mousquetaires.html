@@ -532,6 +532,18 @@
             if (isFollowUp) {
                 prompt = document.getElementById('followUpInput').value.trim();
                 if (!prompt) return;
+
+                // Confirmation visuelle immédiate
+                const replyCard = document.getElementById('userReplyCard');
+                if (replyCard) {
+                    replyCard.innerHTML = `
+                        <h3 style="color:#00bfff">👤 RÉPLIQUE TRANSMISE</h3>
+                        <div class="response-content" style="text-align:center; padding: 20px;">
+                            <span style="color:var(--gold); font-style:italic;">⏳ Votre message a été transmis au Conseil. Attente du nouveau tour de table des Mousquetaires...</span>
+                        </div>
+                    `;
+                }
+
                 // On ajoute la question de l'utilisateur à l'historique
                 globalSessionHistory += `\n\n### 👤 RÉPLIQUE DU COMMANDEMENT :\n${prompt}\n\n`;
             } else {
@@ -577,7 +589,7 @@
                 let prevNick = "Mousquetaire du Roi";
                 for (let m of models) {
                     talkIndicator.innerHTML = `📡 ${prevNick} ➔ ${m.nick}`;
-                    const res = await askOne(m.id, m.nick, prompt, rollingContext, "relais", abortController.signal);
+                    const res = await askOne(m.id, m.nick, prompt, rollingContext, "relais", abortController.signal, isFollowUp);
                     matrix.exposition[m.nick] = res;
                     rollingContext += `\n--- AVIS DE ${m.nick} ---\n${res}\n\n`;
                     prevNick = m.nick;
@@ -588,7 +600,7 @@
                     loader.innerHTML = "⚖️ PHASE II : DROIT DE RÉPONSE & CONFRONTATION...";
                     talkIndicator.innerHTML = `⚖️ TRIBUNAL DE LA RAISON`;
                     for (let m of models) {
-                        const feedback = await askOne(m.id, m.nick, prompt, rollingContext, "confrontation", abortController.signal);
+                        const feedback = await askOne(m.id, m.nick, prompt, rollingContext, "confrontation", abortController.signal, isFollowUp);
                         matrix.critique[m.nick] = feedback;
                     }
                 }
@@ -655,7 +667,7 @@
             abortController = null;
         }
 
-        async function askOne(model, nickname, userPrompt, context, phase, signal) {
+        async function askOne(model, nickname, userPrompt, context, phase, signal, isFollowUp = false) {
             const grid = document.getElementById('responsesGrid');
             const safeModelId = model.replace(/[:.]/g, '-');
             const cardId = `res-${safeModelId}`;
@@ -681,6 +693,13 @@
             const sword = document.getElementById(swordId);
 
             sword.className = 'sword-container state-received';
+
+            // Si c'est un dialogue continu, on prépare la zone
+            if (isFollowUp && phase === "relais" && responseArea.innerHTML.includes("Réflexion...")) {
+                // On ne vide pas, on attend la réponse
+            } else if (!isFollowUp && phase === "relais") {
+                responseArea.innerHTML = "Réflexion...";
+            }
 
             const myRole = roles[model] || roles[model.split(':')[0] + ':latest'] || 'EXPERT SCIENTIFIQUE';
             let systemMsg = "";
@@ -727,19 +746,22 @@
                 const htmlContent = marked.parse(content);
 
                 if (phase === "relais") {
-                    responseArea.innerHTML = htmlContent;
-                } else {
-                    // Pour la confrontation, on vérifie si c'est une relance pour ne pas dupliquer le bloc
-                    const existingCritique = responseArea.querySelector('.critique-block');
-                    const critiqueHtml = `<div class="critique-block" style="margin-top:15px; border-top: 1px dashed var(--gold); padding-top:10px; background: rgba(0, 191, 255, 0.02);">
-                        <span style="color:#00bfff; font-size:0.8em; font-weight:bold;">⚖️ RÉACTION & DROIT DE RÉPONSE :</span><br>${htmlContent}
-                    </div>`;
+                    if (isFollowUp) {
+                        // Nettoyer le "Réflexion..." si présent
+                        if (responseArea.innerHTML === "Réflexion...") responseArea.innerHTML = "";
 
-                    if (existingCritique) {
-                        existingCritique.outerHTML = critiqueHtml;
+                        responseArea.innerHTML += `<div class="dialogue-turn" style="margin-top:25px; border-top: 2px solid var(--gold); padding-top:15px; background: rgba(255, 215, 0, 0.03);">
+                            <span style="color:var(--gold); font-size:0.85em; font-weight:bold;">⚔️ NOUVELLE RÉPLIQUE AU CONSEIL :</span><br>${htmlContent}
+                        </div>`;
                     } else {
-                        responseArea.innerHTML += critiqueHtml;
+                        responseArea.innerHTML = htmlContent;
                     }
+                } else {
+                    // Pour la confrontation, on ajoute toujours un bloc (même en follow-up)
+                    const critiqueHtml = `<div class="critique-block" style="margin-top:15px; border-top: 1px dashed #00bfff; padding-top:10px; background: rgba(0, 191, 255, 0.02);">
+                        <span style="color:#00bfff; font-size:0.8em; font-weight:bold;">⚖️ DROIT DE RÉPONSE (TOUR ${isFollowUp ? 'SUIVANT' : 'ACTUEL'}) :</span><br>${htmlContent}
+                    </div>`;
+                    responseArea.innerHTML += critiqueHtml;
                 }
 
                 sword.className = 'sword-container state-done';
