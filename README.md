@@ -1,7 +1,7 @@
 # ⚔️ THE MUSKETEER PROTOCOL : DARTAGNAN VISION 360° 🔱
 ## *L'Arsenal de l'Ingénierie de Rupture — Version V8.4 "Indestructible"*
 
-> **🔧 DERNIÈRE MISE À JOUR : 08 Juillet 2026 - 20:44 H**
+> **🔧 DERNIÈRE MISE À JOUR : 10 Juillet 2026 - 20:44 H**
 > * **Liaison Royale (Proxy Bridge)** : Stabilité totale, fini les erreurs CORS.
 > * **Baptême des Héros** : Mémoire persistante des noms adoubés.
 > * **UX Excellence** : Scroll auto et info-bulles sur les actions.
