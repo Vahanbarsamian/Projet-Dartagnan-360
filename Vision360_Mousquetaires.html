@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dartagnan V9.14 - Conseil Scientifique des Mousquetaires</title>
+    <title>Dartagnan V9.15 - Conseil Scientifique des Mousquetaires</title>
     <style>
         :root {
             --blue-royal: #002366;
@@ -12,6 +12,17 @@
             --card-bg: #111;
             --text: #ccc;
             --border: #222;
+        }
+
+        @media print {
+            body { background: white !important; color: black !important; overflow: visible !important; height: auto !important; }
+            .header-container, .config-bar, .input-area, .right-panel, .action-btns, .btn-small, #backToTop, #searchBar { display: none !important; }
+            .main-container { display: block !important; }
+            .responses-grid { display: block !important; overflow: visible !important; }
+            .response-card { border: 1px solid #ccc !important; background: white !important; color: black !important; page-break-inside: avoid; margin-bottom: 20px !important; box-shadow: none !important; }
+            .response-card h3 { color: black !important; border-bottom: 1px solid black !important; }
+            .sword-container { display: none !important; }
+            .highlight { background: #dfd !important; color: black !important; border: 1px solid #080; }
         }
 
         body {
@@ -245,6 +256,11 @@
                 <button class="btn-small" style="color: #f44;" onclick="justTrash()" title="Effacer la session sans sauvegarder">🗑️ JETER</button>
                 <button class="btn-small" style="color: #0ff;" onclick="resetInterface()" title="Réinitialiser la taille des fenêtres">🎯 RESET</button>
             </div>
+            <div style="display: flex; gap: 5px; margin-top: 5px;">
+                <button class="btn-small" style="color: #fff; background: #004;" onclick="window.print()" title="Imprimer ou Enregistrer en PDF">🖨️ IMPRIMER / PDF</button>
+                <button class="btn-small" style="color: #fff; background: #440;" onclick="exportToRendus()" title="Exporter le rapport HTML dans le dossier Rendus">💾 EXPORT RENDU</button>
+                <button class="btn-small" style="color: #fff; background: #040;" onclick="shareDiscussion()" title="Copier le résumé Markdown">🔗 PARTAGER</button>
+            </div>
             <button id="btnSynthese" onclick="generateSynthese()" style="display:none; background: #600; color: #fff; font-size: 0.8em; padding: 10px; border: 1px solid var(--gold);">🔱 GÉNÉRER LA SYNTHÈSE SUPRÊME</button>
             <button id="btnAuthorizeAll" onclick="authorizeAll()" style="display:none; background: #050; color: #fff; font-size: 0.8em; padding: 10px; border: 1px solid #0f0;">🔱 APPLIQUER LES MODIFICATIONS</button>
             <div id="whoIsTalking"></div>
@@ -365,7 +381,7 @@
 
             await fetchModels();
             await fetchArchives();
-            ticker.innerHTML = "<b style='color:#0f0'>✨ ARSENAL V9.14 : TRIBUNAL DE LA RAISON OPÉRATIONNEL ✨</b>";
+            ticker.innerHTML = "<b style='color:#0f0'>✨ ARSENAL V9.15 : TRIBUNAL DE LA RAISON OPÉRATIONNEL ✨</b>";
             btn.innerText = "🔱 SYSTÈME ACTIF";
             btn.style.background = "#050";
             btn.disabled = false;
@@ -1120,6 +1136,62 @@
 
                 el.innerHTML = tempDiv.innerHTML;
             });
+        }
+
+        async function exportToRendus() {
+            const grid = document.getElementById('responsesGrid');
+            if (grid.innerHTML === "") return alert("Rien à exporter.");
+
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+            const fileName = `Rapport_Dartagnan_${timestamp}.html`;
+
+            // Création d'un document HTML complet pour le rendu
+            const fullContent = `
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <style>
+                        body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
+                        .card { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
+                        h3 { color: #002366; border-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+                        .meta { color: #666; font-size: 0.8em; margin-bottom: 10px; }
+                    </style>
+                </head>
+                <body>
+                    <h1>🔱 RAPPORT DE CONSEIL DARTAGNAN</h1>
+                    <div class="meta">Généré le : ${new Date().toLocaleString()}</div>
+                    <hr>
+                    ${grid.innerHTML}
+                </body>
+                </html>
+            `;
+
+            try {
+                const r = await fetch(`${BRIDGE_URL}/save`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `name=${encodeURIComponent(fileName)}&content=${encodeURIComponent(fullContent)}`
+                });
+                if (r.ok) alert(`🏰 Rapport consigné dans le dossier Rendus :\n${fileName}`);
+            } catch (e) {
+                alert("Erreur lors de l'export.");
+            }
+        }
+
+        async function shareDiscussion() {
+            const grid = document.getElementById('responsesGrid');
+            if (grid.innerHTML === "") return alert("Rien à partager.");
+
+            let markdown = `# 🔱 RAPPORT DE CONSEIL DARTAGNAN\n\n`;
+            const cards = grid.querySelectorAll('.response-card');
+            cards.forEach(c => {
+                const title = c.querySelector('h3').innerText.replace(/🔄|⛶|📋|🚀/g, '').trim();
+                const content = c.querySelector('.response-content').innerText;
+                markdown += `## ⚔️ ${title}\n\n${content}\n\n---\n\n`;
+            });
+
+            navigator.clipboard.writeText(markdown);
+            alert("🔗 Résumé Markdown copié dans le presse-papier !");
         }
 
         function scrollToTop() {
