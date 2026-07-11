@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dartagnan V9.15 - Conseil Scientifique des Mousquetaires</title>
+    <title>Dartagnan V9.16 - Conseil Scientifique des Mousquetaires</title>
     <style>
         :root {
             --blue-royal: #002366;
@@ -58,6 +58,20 @@
             align-items: center;
             gap: 10px;
         }
+        #headerDate { cursor: pointer; transition: 0.3s; }
+        #headerDate:hover { text-shadow: 0 0 15px var(--gold); transform: scale(1.05); }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            border-bottom: 1px solid #222;
+            font-size: 0.9em;
+        }
+        .todo-item input[type="checkbox"] { accent-color: var(--gold); }
+        .todo-item.done span { text-decoration: line-through; opacity: 0.5; }
+        .todo-delete { color: #f44; cursor: pointer; margin-left: auto; font-weight: bold; }
 
         #searchBar {
             background: #000;
@@ -210,7 +224,7 @@
 <body>
 
     <div class="header-container">
-        <div id="headerDate" class="header-info"></div>
+        <div id="headerDate" class="header-info" onclick="toggleTodoModal()" title="Ouvrir les Ordres du Jour"></div>
         <h1>⚔️ Conseil Scientifique des Mousquetaires : Pour le Roi et la France ⚔️</h1>
         <div class="header-info" style="justify-content: flex-end;">
             <input type="text" id="searchBar" placeholder="🔍 Rechercher dans le conseil..." oninput="searchInResponses()">
@@ -299,6 +313,23 @@
         </div>
     </div>
 
+    <div id="todoModal" class="modal">
+        <div class="modal-content" style="max-width: 400px; border-color: var(--gold);">
+            <span class="close-modal" onclick="toggleTodoModal()">&times;</span>
+            <h2 style="color: var(--gold); font-size: 1.2em; margin-top: 0; font-family: 'Copperplate', serif;">📜 ORDRES DU JOUR</h2>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
+                <input type="text" id="todoInput" placeholder="Nouvel objectif..." style="background: #000; border: 1px solid #333; color: #fff; padding: 8px; border-radius: 4px;">
+                <div style="display: flex; gap: 5px;">
+                    <input type="date" id="todoDate" style="flex: 1; background: #000; border: 1px solid #333; color: #fff; padding: 5px; border-radius: 4px;">
+                    <button class="btn-small btn-gold" style="padding: 0 15px;" onclick="addTodo()">AJOUTER ➕</button>
+                </div>
+            </div>
+            <div id="todoList" style="max-height: 300px; overflow-y: auto;">
+                <!-- Les tâches apparaîtront ici -->
+            </div>
+        </div>
+    </div>
+
     <button id="backToTop" onclick="scrollToTop()" title="Remonter en haut">↑</button>
 
     <script>
@@ -347,6 +378,7 @@
         async function startAllSystems() {
             updateDateTime();
             setInterval(updateDateTime, 1000);
+            loadTodos();
 
             const btn = document.getElementById('btnLaunch');
             const ticker = document.getElementById('systemTicker');
@@ -1212,6 +1244,71 @@
 
         document.getElementById('responsesGrid').addEventListener('scroll', handleScroll);
         window.addEventListener('scroll', handleScroll);
+
+        function toggleTodoModal() {
+            const modal = document.getElementById('todoModal');
+            modal.style.display = (modal.style.display === 'block') ? 'none' : 'block';
+        }
+
+        function addTodo() {
+            const input = document.getElementById('todoInput');
+            const dateInput = document.getElementById('todoDate');
+            const text = input.value.trim();
+            const date = dateInput.value;
+            if (!text) return;
+
+            const todos = JSON.parse(localStorage.getItem('dartagnan_todos') || '[]');
+            todos.push({ text: text, date: date, done: false, id: Date.now() });
+            localStorage.setItem('dartagnan_todos', JSON.stringify(todos));
+            input.value = '';
+            dateInput.value = '';
+            renderTodos();
+        }
+
+        function toggleTodo(id) {
+            const todos = JSON.parse(localStorage.getItem('dartagnan_todos') || '[]');
+            const todo = todos.find(t => t.id === id);
+            if (todo) {
+                todo.done = !todo.done;
+                localStorage.setItem('dartagnan_todos', JSON.stringify(todos));
+                renderTodos();
+            }
+        }
+
+        function deleteTodo(id) {
+            let todos = JSON.parse(localStorage.getItem('dartagnan_todos') || '[]');
+            todos = todos.filter(t => t.id !== id);
+            localStorage.setItem('dartagnan_todos', JSON.stringify(todos));
+            renderTodos();
+        }
+
+        function renderTodos() {
+            const list = document.getElementById('todoList');
+            const todos = JSON.parse(localStorage.getItem('dartagnan_todos') || '[]');
+
+            // Tri par date
+            todos.sort((a, b) => (a.date || '9999-12-31').localeCompare(b.date || '9999-12-31'));
+
+            list.innerHTML = '';
+            todos.forEach(t => {
+                const div = document.createElement('div');
+                div.className = `todo-item ${t.done ? 'done' : ''}`;
+                const dateStr = t.date ? `<small style="color:var(--gold); border: 1px solid #333; padding: 2px 4px; border-radius: 3px; margin-right: 8px;">${new Date(t.date).toLocaleDateString('fr-FR')}</small>` : '';
+                div.innerHTML = `
+                    <input type="checkbox" ${t.done ? 'checked' : ''} onclick="toggleTodo(${t.id})">
+                    <div style="flex: 1; display: flex; flex-direction: column;">
+                        <span style="font-size: 0.95em;">${t.text}</span>
+                        ${dateStr}
+                    </div>
+                    <span class="todo-delete" onclick="deleteTodo(${t.id})">&times;</span>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function loadTodos() {
+            renderTodos();
+        }
 
         mermaid.initialize({ startOnLoad: false, theme: 'dark' });
     </script>
